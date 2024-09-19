@@ -73,6 +73,12 @@ Inicio
       </div>
       <!-- /.row -->
     </div><!-- /.container-fluid -->
+    <br>
+        <div class="alert alert-danger" v-if="mensaje">
+            <center>
+                @{{ getMensaje }}
+            </center>
+        </div>
 
 
     <div class="modal fade" id="modal-lg" style="display: block; padding-right: 17px;" aria-modal="true" role="dialog">
@@ -143,7 +149,8 @@ Inicio
                 N_reuniones: <?php echo json_encode($N_reuniones);?>,
                 pendientes: <?php echo json_encode($pendientes);?>,
                 idcotizacion: [],
-                mensaje: ''
+                mensaje: false,
+                getMensaje: ''
             },
             mounted() {
                 this.checkPendientes();
@@ -171,7 +178,52 @@ Inicio
                             }
                         }
                     }
-                    console.log(this.idcotizacion);
+
+                    let datos = {
+                        cotizaciones: this.idcotizacion
+                    };
+
+                    if(this.idcotizacion.length > 0) {
+                        const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: "btn btn-success",
+                            cancelButton: "btn btn-danger"
+                        },
+                        buttonsStyling: false
+                        });
+                        swalWithBootstrapButtons.fire({
+                            title: "Estas Seguro?",
+                            text: "El estatus de las cotizaciones seleccionadas cambiara a Rechazado, por lo que no se mostraran en las alertas de nuevo!",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonText: "Si, cambiar!",
+                            cancelButtonText: "No, cancelar!",
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                axios.post('/cotizacion/rechazar', datos).then(response => {
+                                    if(response.data.estatus == 'OK') {
+                                        this.mensaje = true;
+                                        this.getMensaje = response.data.mensaje;
+                                        $('#modal-lg').modal('hide');
+
+                                        swalWithBootstrapButtons.fire({
+                                            title: "Hecho!",
+                                            text: "El estatus de las cotizaciones cambio.",
+                                            icon: "success"
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Hubo un error',
+                            text: 'Tienes que seleccionar al menos una opción para, cerrar las cotizaciones',
+                            icon: 'error'
+                        });
+                    }
                 }
             },
         });

@@ -42,7 +42,9 @@
             $clientesForm = request()->routeIs('catalogos.show_form');
             $isActiveUsuarios = request()->routeIs('admin.listado_usuario');
             $isActiveRoles = request()->routeIs('admin.listado_roles');
-            $roles = request()->routeIs('admin.roles_save');
+            $roles = request()->routeIs('admin.roles');
+            $rolXpermiso = request()->routeIs('admin.rolxpermiso');
+            $permisos = request()->routeIs('admin.permisos');
             $inicio = request()->routeIs('inicio');
           @endphp
 
@@ -239,8 +241,8 @@
           @endif
 
           @if (validacion_rol(Auth()->user()->idrol,'ROLES'))
-            <li class="nav-item {{  $isActiveRoles || $roles ? 'menu-is-opening menu-open' : '' }}">
-                <a href="" class="nav-link {{  $isActiveRoles ? 'active' : '' }}">
+            <li class="nav-item {{  $isActiveRoles || $roles || $rolXpermiso || $permisos ? 'menu-is-opening menu-open' : '' }}">
+                <a href="" class="nav-link {{  $isActiveRoles || $roles || $rolXpermiso || $permisos ? 'active' : '' }}">
                     <i class="fas fa-wrench"></i>
                 <p>
                     Roles / Perfiles

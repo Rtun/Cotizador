@@ -2,32 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApiToken;
 use App\Models\Cot_Producto;
 use App\Models\Marca;
 use App\Models\Proveedor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class ProductosController extends Controller
 {
     public function listado() {
         //esta funcion muestra el listado de todos los productos que esten activos
-        $productos = Cot_Producto::join('users', 'users.id','=','cot_productos.idusuario')
-                                    ->join('prod_marca', 'prod_marca.idmarca', '=', 'cot_productos.idmarca')
+        $productos = Cot_Producto::join('prod_marca', 'prod_marca.idmarca', '=', 'cot_productos.idmarca')
                                     ->join('prod_proveedor', 'prod_proveedor.idproveedor', '=', 'cot_productos.idproveedor')
                                     ->select(
                                         "idproductos",
-                                        "prod_cve_producto",
+                                        "prod_cve",
                                         "prod_nombre",
                                         "prod_medicion",
                                         "prod_precio_brut",
                                         "prod_marca.m_nombre as marca",
                                         "modelo",
                                         "prod_proveedor.prv_nombre as proveedor",
-                                        "users.name as nombre_usuario",
                                         "prod_tipo"
-                                        ,DB::Raw("DATE_FORMAT(prod_fecha_creacion,'%Y-%m-%d') as fecha_creacion")
                                         )
                                     ->where('cot_productos.status', 'AC')
                                     ->get()->toArray();
@@ -63,14 +62,14 @@ class ProductosController extends Controller
     public function save_productos(Request $r) {
         $context = $r->all();
         $status = '';
-        $ultimoProducto = Cot_Producto::orderBy('prod_cve_producto', 'desc')->first();
+        $ultimoProducto = Cot_Producto::orderBy('prod_cve', 'desc')->first();
         $nuevaClave = $ultimoProducto->prod_cve_producto + 1;
 
         switch ($context['operacion']) {
 
             case 'Agregar';
             $producto = new Cot_Producto();
-            $producto->prod_cve_producto = $nuevaClave;
+            $producto->prod_cve = $nuevaClave;
             $producto->prod_nombre = $context['nombre_prod'];
             $producto->idmarca = $context['idmarca'];
             $producto->modelo = $context['modelo'];
@@ -121,5 +120,105 @@ class ProductosController extends Controller
         }
 
         return redirect()->to('/catalogos/listado/productos');
+    }
+
+
+    public function api_save_producto(Request $r) {
+        $context = $r->all();
+
+        switch ($context['key']) {
+            case 'syscom':
+                $marca = Marca::where('m_nombre', $context['idmarca'])->first();
+                $proveedor = Proveedor::where('prv_nombre', $context['idproveedor'])->first();
+                if(!$marca) {
+                    $marca = new Marca();
+                    $marca->m_nombre = $context['idmarca'];
+                    $marca->idusuario = usuario()->id;
+                    $marca->m_fecha_creacion = hoy();
+                    $marca->save();
+                }
+
+                if(!$proveedor) {
+                    $proveedor = new Proveedor();
+                    $proveedor->prv_nombre = $context['idproveedor'];
+                    $proveedor->idusuario = usuario()->id;
+                    $proveedor->prv_fecha_creacion = hoy();
+                    $proveedor->save();
+                }
+                $buscarProd = Cot_Producto::where('prod_cve_syscom', $context['cve_prod'])->first();
+
+                if(!$buscarProd) {
+                    $producto = new Cot_Producto();
+                    $producto->prod_cve_syscom = $context['cve_prod'];
+                    $producto->prod_nombre = $context['nombre_prod'];
+                    $producto->idmarca = $marca->idmarca;
+                    $producto->modelo = $context['modelo'];
+                    $producto->idproveedor = $proveedor->idproveedor;
+                    $producto->prod_medicion = $context['medicion_prod'];
+                    $producto->prod_precio_brut = $context['precio_prod'];
+                    $producto->prod_tipo = $context['tipo_prod'];
+                    $producto->status = 'AC';
+                    $producto->save();
+
+                    $parametros = [
+                        'tabla' => 'cot_productos',
+                        'objeto_modificado' => $producto->idproductos,
+                        'idusuario' => usuario()->id,
+                        'fecha' => hoy(),
+                        'accion' => 'Agregar/Registrar',
+                    ];
+                    save_bitacora($parametros);
+                }
+                break;
+
+            case 'tvc':
+                dd('todo esto viene de tvc');
+                break;
+        }
+
+        return redirect()->to('/catalogos/listado/productos');
+    }
+
+
+    public function buscarProductos(Request $r){
+        $context = $r->all();
+        // Verificar si el token ha expirado
+        if (ApiToken::isTokenExpired()) {
+            // Solicitar un nuevo token (esto depende de cómo la API maneje la renovación)
+            $newToken = $this->renovarToken();
+
+            // Actualizar el token en la base de datos
+            ApiToken::updateToken($context['key'], $newToken, Carbon::now()->addDays(365));
+        }
+
+        // Usar el token actualizado
+        $token = ApiToken::getToken($context['key']);
+
+        // Hacer la petición a la API externa
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+            'Accept' => 'application/json'
+        ])->get('https://developers.syscom.mx/api/v1/productos', [
+            'busqueda' => $context['texto']
+        ]);
+        // Devolver los resultados
+        return response()->json($response->json());
+    }
+
+
+    public function renovarToken()
+    {
+        // Aquí va la lógica para solicitar un nuevo token
+        $response = Http::post('https://developers.syscom.mx/oauth/token', [
+            'client_id' => env('CLIENT_ID_SYSCOM'),
+            'client_secret' => env('CLIENT_SECRET_SYSCOM'),
+            'grant_type' => 'client_credentials'
+        ]);
+
+        if ($response->successful()) {
+            return $response->json()['access_token'];
+        }
+
+        throw new \Exception('Error al renovar el token');
     }
 }

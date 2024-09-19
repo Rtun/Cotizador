@@ -26,7 +26,7 @@ class RegisterController extends Controller
         $usuario->email = $context['email'];
         $usuario->password = $context['password'];
         $usuario->telefono = $context['telefono'];
-        $usuario->idrol = 2;
+        $usuario->idrol = 4;
         $usuario->save();
 
         $parametros = [

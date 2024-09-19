@@ -39,6 +39,7 @@ class LoginController extends Controller
         $getcotizaciones = Cot_Encabezado::where('status', 'AC')
                                         ->where('idusuario', usuario()->id)->get();
         $getreuniones = Reuniones::where('sare_fecha_inicio','>=', hoy())
+                                ->where('sare_status', 'AC')
                                     ->get();
 
         $fechaLimite = Carbon::now()->subMonth(); //calcula la fecha de hace un mes

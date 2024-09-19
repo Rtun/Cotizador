@@ -24,7 +24,7 @@
       <div class="card-tools">
         <form action="{{url('/cotizacion/listado')}}" method="GET">
             {{ csrf_field() }}
-            <button type="submit" class="btn btn-warning">Regresar Al Listado</button>
+            <button type="submit" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</button>
         </form>
       </div>
     </div>
@@ -141,6 +141,14 @@
                         <div class="col-md-4">
                             <!-- /.form-group -->
                             <div class="form-group">
+                                <label>Tipo Cambio:</label>
+                                <input type="text" readonly class="form-control" v-model="datosList.tipo_cambio" name="" value="">
+                            </div>
+                            <!-- /.form-group -->
+                        </div>
+                        <div class="col-md-4">
+                            <!-- /.form-group -->
+                            <div class="form-group">
                                 <label>Fecha de creación:</label>
                                 <input type="text" readonly class="form-control" v-model="datosList.fecha_creacion" name="" value="">
                             </div>
@@ -187,19 +195,19 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(producto, index) in datosList.detalles" :key="index">
-                                            <td>@{{ producto.prod_nombre }}</td>
+                                            <td>@{{ producto.nombre }}</td>
                                             <td>@{{ producto.descripcion }}</td>
                                             <td>@{{ producto.cantidad }}</td>
-                                            <td>@{{ producto.prod_medicion }}</td>
-                                            <td v-if="producto.tipo_cot == 'SR'">Servicio</td>
+                                            <td>@{{ producto.unit_med }}</td>
+                                            <td v-if="producto.tipo == 'SR'">Servicio</td>
                                             <td v-else>Producto</td>
-                                            <td>@{{producto.prod_precio}}</td>
-                                            <td>@{{ producto.prod_precio_adicionales }}</td>
-                                            <td>@{{ producto.prod_precio_desperdicio }}</td>
-                                            <td>@{{ producto.total }}</td>
+                                            <td>@{{producto.costo_u_document}}</td>
+                                            <td>@{{ producto.costo_adicionales }}</td>
+                                            <td>@{{ producto.costo_desperdicio }}</td>
+                                            <td>@{{ producto.precioTotal }}</td>
                                             <td>@{{ producto.moneda }}</td>
                                             <td>
-                                                <button v-show="producto.tipo_cot == 'SR'" type="button" class="btn btn-primary" @click="showAdicionales(index)"><i class="fas fa-eye"></i></button>
+                                                <button v-show="producto.tipo == 'SR'" type="button" class="btn btn-primary" @click="showAdicionales(index)"><i class="fas fa-eye"></i></button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -212,6 +220,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button id="actualizar" class="btn btn-success" @click="actualizarPrecio(datosList.idcotizacion)"><i class="fas fa-sync-alt"></i></button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cerrar</button>
                     {{-- <button type="button" class="btn btn-primary">Guardar</button> --}}
                 </div>
@@ -400,6 +409,62 @@
                             window.location.href = url;
                         }
                     });
+                },
+                actualizarPrecio(id) {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: "btn btn-success",
+                            cancelButton: "btn btn-danger"
+                        },
+                        buttonsStyling: false
+                        });
+                        swalWithBootstrapButtons.fire({
+                            title: "Estas Seguro, quieres actualizar los precios?",
+                            text: "Al aceptar todos los productos que fueron cotizados en dolares, actualizaran el tipo de cambio junto con sus precios",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonText: "Si, actualizar!",
+                            cancelButtonText: "No, cancelar!",
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                let datos = {
+                                    idcotizacion: id,
+                                    productos: this.datosList.detalles,
+                                    servicios: [],
+                                    cot_nombre_cli: this.datosList.cli_nombre,
+                                    cot_empresa_cli: this.datosList.cli_empresa,
+                                    cot_puesto_cli: this.datosList.cli_puesto,
+                                    cot_telefono_cli: this.datosList.cli_puesto,
+                                    cot_correo_cli: this.datosList.cli_correo,
+                                    cot_encabezado: this.datosList.encabezado,
+                                    cot_concepto: this.datosList.concepto,
+                                    crm: this.datosList.crm,
+                                    nombre_documento: this.datosList.documento,
+                                    show_detalle: false
+                                };
+
+                                axios.post('/cotizacion/actualizar/precios', datos).then(response => {
+                                    Swal.fire({
+                                        title: response.data.titulo,
+                                        text: response.data.mensaje,
+                                        icon: response.data.icon,
+                                    }).then(result => {
+                                        if(response.data.icon == 'success') {
+                                            window.location.reload();
+                                        }
+                                    });
+                                }).catch(error => {
+                                    console.log('Este es el error que brinda el servidor => ' + error);
+
+                                    Swal.fire({
+                                        title: 'Hubo un error',
+                                        text: 'Hubo un error en el servidor, por favor contactame',
+                                        icon: 'error'
+                                    });
+                                });
+                            }
+                        });
                 }
             },
         });

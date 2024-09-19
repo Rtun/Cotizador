@@ -31,8 +31,8 @@ Permisos
                 <input type="hidden" name="idrol" value="{{$rol->idrol}}">
                 <table class="table">
                   <tr v-for="permiso in permisos">
-                    <td>
-                      <input type="checkbox" :checked='permiso.asignada' name="idpermiso[]" :value="permiso.idpermiso">
+                      <td>
+                        <input type="checkbox" :checked='permiso.asignada' name="idpermiso[]" :value="permiso.idpermiso">
                       </td>
                       <td>@{{permiso.nombre}}</td>
                   </tr>

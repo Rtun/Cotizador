@@ -226,14 +226,14 @@
                                             <select ref="productoSelect" class="form-control select2 select2bs4 producto-select" style="width: 100%;" name="productos" data-index="0" id="producto-select">
                                                 <option value="" selected disabled>Selecciona un producto</option>
                                                 <option v-for="prod in productos" :value="prod.nombre"
-                                                        :data-id_pr="prod.idproductos"
-                                                        :data-cve_producto="prod.cve_producto"
-                                                        :data-nombre="prod.nombre"
-                                                        :data-unit_med="prod.unit_med"
-                                                        :data-costo_unidad="prod.costo_unidad"
-                                                        :data-marca="prod.marca"
-                                                        :data-modelo="prod.modelo"
-                                                        :data-proveedor="prod.proveedor">
+                                                    :data-id_pr="prod.idproductos"
+                                                    :data-cve_producto="prod.cve_producto"
+                                                    :data-nombre="prod.nombre"
+                                                    :data-unit_med="prod.unit_med"
+                                                    :data-costo_unidad="prod.costo_unidad"
+                                                    :data-marca="prod.marca"
+                                                    :data-modelo="prod.modelo"
+                                                    :data-proveedor="prod.proveedor">
                                                     @{{ prod.nombre }}
                                                 </option>
                                             </select>
@@ -677,6 +677,7 @@
                     costo_desperdicio: 0,
                     costo_adicionales: 0,
                     cantidad: 1,
+                    tipo_cambio: '',
                     utilidad: '0.25',
                     unit_med: '',
                     moneda:'',
@@ -694,6 +695,7 @@
                     costo_adicionales: 0,
                     utilidad:'0.35',
                     unit_med: 'SRV',
+                    tipo_cambio: '',
                     moneda:'MXN',
                     precioTotal: 0,
                     adicionales: [],
@@ -907,8 +909,10 @@
                         if ( this.currentProducto.id == null) {
                             this.currentProducto.id = 0;
                         }
+                        this.currentProducto.tipo_cambio = this.tipo_cambio;
                         this.productosList.push({...this.currentProducto});
                         this.resetCurrentProducto();
+                        console.log(this.productosList);
                         $('#modal-productos').modal('hide');
                     }
                 },
@@ -920,16 +924,20 @@
                     this.currentProducto = {
                         clave: 0,
                         nombre: '',
+                        marca: '',
+                        modelo: '',
+                        proveedor: '',
                         id: '',
+                        precio_dolar: 0,
                         costo_unidad: 0,
                         costo_desperdicio: 0,
                         costo_adicionales: 0,
                         cantidad: 1,
+                        tipo_cambio: '',
                         utilidad: '0.25',
                         unit_med: '',
                         moneda:'',
                         isDollar: false,
-                        reg_nuevo_prod: false,
                         iva: 0,
                         tipo:'PR'
                     };
@@ -988,7 +996,8 @@
                 },
                 // Servicios
                 addServicio() {
-                    if(this.servicios.nombre !== '' && this.servicios.cantidad > 0 && this.servicios.costo_unidad > 0){
+                    if(this.servicios.nombre !== ''){
+                        this.servicios.tipo_cambio = this.tipo_cambio;
                         this.servicios.costo_u_document = this.servicios.precioTotal;
                         this.serviciosList.push({...this.servicios});
                         this.resetservicios();
@@ -1114,7 +1123,7 @@
                             crm: this.crm,
                             show_detalle: this.show_detalle,
                         }
-                        // console.log(datos);
+
                         Swal.fire({
                             title: "Estas Seguro de guardar?",
                             text: "Al darle aceptar por el momento ya no se podra modificar",

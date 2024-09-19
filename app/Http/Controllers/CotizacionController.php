@@ -123,7 +123,7 @@ class CotizacionController extends Controller
                                 ->join('prod_proveedor', 'prod_proveedor.idproveedor', '=', 'cot_productos.idproveedor')
                                 ->select(
                                     "cot_productos.idproductos", // Asegúrate de que este es el campo correcto de la tabla cot_productos
-                                    "cot_productos.prod_cve_producto as cve_producto",
+                                    "cot_productos.prod_cve as cve_producto",
                                     "cot_productos.prod_nombre as nombre",
                                     "cot_productos.prod_medicion as unit_med",
                                     "cot_productos.prod_precio_brut as costo_unidad",
@@ -190,7 +190,6 @@ class CotizacionController extends Controller
 
 
     public function showForm_editar($idcotizacion) {
-        // dd($context);
         //Esta funcion envia al formulario de edicion decotizaciones
         //amigo programador fue realizado de esta manera porq no encontre tra forma de realizarlo
         $cotizacionesRaw = DB::table('cot_encabezado')
@@ -225,6 +224,7 @@ class CotizacionController extends Controller
                                 'cot_detalle.cotdet_precio_desperdicio as prod_precio_desperdicio',
                                 'cot_detalle.cotdet_precio_adicionales as prod_precio_adicionales',
                                 'cot_detalle.cotdet_descripcion as descripcion',
+                                'cot_detalle.cotdet_tipo_cambio as tipo_cambio',
                                 'cot_detalle.cotdet_subtotal as total',
                                 'cot_productos.prod_nombre as prod_nombre',
                                 'cot_productos.prod_medicion as prod_medicion',
@@ -260,6 +260,7 @@ class CotizacionController extends Controller
                                 'cot_detalle.cotdet_precio_adicionales',
                                 'cot_detalle.cotdet_descripcion',
                                 'cot_detalle.cotdet_id_producto',
+                                'cot_detalle.cotdet_tipo_cambio',
                                 'cot_productos.prod_nombre',
                                 'cot_productos.prod_medicion',
                                 'cot_productos.modelo',
@@ -270,7 +271,7 @@ class CotizacionController extends Controller
                                 'cot_detalle.cotdet_subtotal',
                             )
                             ->where('cot_encabezado.idcotizacion', $idcotizacion)
-                            ->whereRaw("LOWER(cot_encabezado.status) = 'ac'")
+                            ->whereRaw("LOWER(cot_encabezado.status) = 'AC'")
                             ->get()
                             ->map(function ($cotizacion) {
                                 $adicionales = [];
@@ -315,6 +316,7 @@ class CotizacionController extends Controller
                     'cli_empresa' => $item->cli_empresa,
                     'cli_puesto' => $item->cli_puesto,
                     'estado_cot' => $item->estado_cot,
+                    'tipo_cambio'=> $item->tipo_cambio,
                     'detalles' => [],
                 ];
             }
@@ -330,6 +332,7 @@ class CotizacionController extends Controller
                 'modelo' => $item->modelo,
                 'proveedor' => $item->proveedor,
                 'unit_med' => $item->prod_medicion,
+                'tipo_cambio'=> $item->tipo_cambio,
                 'costo_u_document' => $item->prod_precio,
                 'utilidad' => $item->utilidad,
                 'costo_desperdicio' => $item->prod_precio_desperdicio,
@@ -350,7 +353,7 @@ class CotizacionController extends Controller
                                 ->join('prod_proveedor', 'prod_proveedor.idproveedor', '=', 'cot_productos.idproveedor')
                                 ->select(
                                     "cot_productos.idproductos", // Asegúrate de que este es el campo correcto de la tabla cot_productos
-                                    "cot_productos.prod_cve_producto as cve_producto",
+                                    "cot_productos.prod_cve as cve_producto",
                                     "cot_productos.prod_nombre as nombre",
                                     "cot_productos.prod_medicion as unit_med",
                                     "cot_productos.prod_precio_brut as costo_unidad",
@@ -432,6 +435,7 @@ class CotizacionController extends Controller
                 if($producto['tipo'] === 'SR') {
                     $tabla_cot_prod->cotdet_descripcion = $producto['nombre'];
                 }
+                $tabla_cot_prod->cotdet_tipo_cambio = $producto['tipo_cambio'];
                 $tabla_cot_prod->cotdet_subtotal =$producto['precioTotal'];
                 $tabla_cot_prod->cotdet_moneda = $producto['moneda'];
                 $tabla_cot_prod->cotdet_iva = 1;
@@ -456,7 +460,7 @@ class CotizacionController extends Controller
             }
             $tablas_afectadas[] = 'cot_detalle';
         }
-// dd('si termine');
+
         $tablas_afectadas[] = 'cotizacion';
         $parametros = [
             'tabla' => $tablas_afectadas,
@@ -555,6 +559,14 @@ class CotizacionController extends Controller
         $spreadsheet->setActiveSheetIndex(0)->setCellValue("B".($finProductos + 10), $user->name);
         $spreadsheet->setActiveSheetIndex(0)->setCellValue("B".($finProductos + 11), 'Ing. Preventa');
         $spreadsheet->setActiveSheetIndex(0)->setCellValue("B".($finProductos + 14), $user->email);
+        if(isset($context['nombre_documento'])) {
+            $path = storage_path('app/documentos/'.$context['nombre_documento'].'.xlsx');
+
+            // Verificar si existe el archivo anterior y eliminarlo
+            if (file_exists($path)) {
+                unlink($path);  // Elimina el archivo anterior
+            }
+        }
 
         $name='CRM_'.$context['crm'].'_'.str_replace(' ', '_',$context['cot_encabezado']).'_'.str_replace(' ', '_', $context['cot_nombre_cli']).'_'.str_replace(' ', '_', $context['cot_empresa_cli']).'_'.time();
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, "Xlsx");
@@ -600,7 +612,6 @@ class CotizacionController extends Controller
 
     public function cotizacion_x_crm ($crm) {
         //Este metodo realiza la consulta con el numero de crm seleccionado desde el front y devuelve una segunda vista con el resultados
-        // $documento = storage_path('app/documentos/');
         if (usuario()->idrol === 1) {
             $cotizaciones = DB::table('cot_encabezado')
                             ->join('users', 'id','=','cot_encabezado.idusuario')
@@ -669,6 +680,7 @@ class CotizacionController extends Controller
                                 'cot_encabezado.cot_num_crm as crm',
                                 'cot_encabezado.cot_encabezado as encabezado',
                                 'cot_encabezado.estado_cot as estado_cot',
+                                'cot_encabezado.cot_documento as documento',
                                 'conceptos.con_texto as concepto',
                                 'cot_clientes.cli_nombre as cli_nombre',
                                 'cot_clientes.cli_telefono as cli_telefono',
@@ -681,11 +693,13 @@ class CotizacionController extends Controller
                                 'cot_detalle.cotdet_precio_brut as prod_precio',
                                 'cot_detalle.cotdet_precio_desperdicio as prod_precio_desperdicio',
                                 'cot_detalle.cotdet_precio_adicionales as prod_precio_adicionales',
+                                'cot_detalle.cotdet_tipo_cambio as tipo_cambio',
                                 'cot_detalle.cotdet_descripcion as descripcion',
                                 'cot_detalle.cotdet_subtotal as total',
                                 'cot_productos.prod_nombre as prod_nombre',
                                 'cot_productos.prod_medicion as prod_medicion',
                                 'cot_detalle.cotdet_tipo_cot as tipo_cot',
+                                'cot_detalle.cotdet_utilidad as utilidad',
                                 'cot_impuestos.valor as iva',
                                 DB::Raw("DATE_FORMAT(cot_fecha_creacion,'%d-%m-%Y') as fecha_creacion"),
                                 DB::Raw("DATE_FORMAT(cot_fecha_modificacion,'%d-%m-%Y') as fecha_modificacion"),
@@ -703,6 +717,7 @@ class CotizacionController extends Controller
                                 'cot_encabezado.cot_fecha_creacion',
                                 'cot_encabezado.cot_fecha_modificacion',
                                 'cot_encabezado.cot_fecha_cierre',
+                                'cot_encabezado.cot_documento',
                                 'conceptos.con_texto',
                                 'cot_clientes.cli_nombre',
                                 'cot_clientes.cli_telefono',
@@ -715,10 +730,12 @@ class CotizacionController extends Controller
                                 'cot_detalle.cotdet_precio_brut',
                                 'cot_detalle.cotdet_precio_desperdicio',
                                 'cot_detalle.cotdet_precio_adicionales',
+                                'cot_detalle.cotdet_tipo_cambio',
                                 'cot_detalle.cotdet_descripcion',
                                 'cot_productos.prod_nombre',
                                 'cot_productos.prod_medicion',
                                 'cot_detalle.cotdet_tipo_cot',
+                                'cot_detalle.cotdet_utilidad',
                                 'cot_impuestos.valor',
                                 'cot_detalle.cotdet_subtotal',
                             )
@@ -769,6 +786,8 @@ class CotizacionController extends Controller
                     'fecha_creacion' => $item->fecha_creacion,
                     'fecha_modificacion' => $item->fecha_modificacion,
                     'fecha_cierre' => $item->fecha_cierre,
+                    'documento' => $item->documento,
+                    'tipo_cambio' => $item->tipo_cambio,
                     'detalles' => [],
                 ];
             }
@@ -776,16 +795,18 @@ class CotizacionController extends Controller
             $detalle = [
                 'idcot_detalle' => $item->idcot_detalle,
                 'descripcion' => $item->descripcion,
-                'prod_precio' => $item->prod_precio,
+                'costo_u_document' => $item->prod_precio,
                 'moneda' => $item->cotdet_moneda,
                 // 'cantidad' => count($cotizacionesAgrupadas[$cotizacionId]['detalles']),
                 'cantidad' => $item->cantidad,
-                'prod_nombre' => $item->prod_nombre,
-                'prod_medicion' => $item->prod_medicion,
-                'prod_precio_desperdicio' => $item->prod_precio_desperdicio,
-                'prod_precio_adicionales' => $item->prod_precio_adicionales,
-                'total' => $item->total,
-                'tipo_cot' => $item->tipo_cot,
+                'tipo_cambio' => $item->tipo_cambio,
+                'nombre' => $item->prod_nombre,
+                'unit_med' => $item->prod_medicion,
+                'costo_desperdicio' => $item->prod_precio_desperdicio,
+                'costo_adicionales' => $item->prod_precio_adicionales,
+                'precioTotal' => $item->total,
+                'tipo' => $item->tipo_cot,
+                'utilidad' => $item->utilidad,
                 'iva' => $item->iva,
                 'adicionales' => $item->adicionales
             ];
@@ -833,6 +854,85 @@ class CotizacionController extends Controller
             return response()->json([
                 'message' => 'OK'
             ], 201);
+        }
+
+
+        public function actualizar_precios(Request $r) {
+            $context = $r->all();
+
+            $imprimir = $this->descargar_cotizacion($context);
+            $mensaje = '';
+            $icon = '';
+            $titulo = '';
+
+            $cot_detalle = Cot_Detalle::where('idcotizacion', $context['idcotizacion'])
+                                        ->where('cotdet_moneda', 'USD')
+                                        ->get();
+
+            if (count($cot_detalle) > 0) {
+                $token = '43695a51107d9fabe57589a32c7498776c286be5954b5031b06989acf74c173c';
+                $response = Http::withHeaders([
+                    'Bmx-Token' => $token,
+                ])->get('https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/oportuno');
+                $decodificacion = json_decode($response, true);
+                $dolar = $decodificacion['bmx']['series'][0]['datos'][0]['dato'] + .60;
+                foreach ($cot_detalle as $cot) {
+                    $suma = $cot->cotdet_precio_brut + $cot->cotdet_precio_desperdicio + $cot->cotdet_precio_adicionales;
+                    $mxm = $suma * $dolar;
+                    $precio = $cot->cotdet_cantidad * $mxm;
+                    $tipo_cambio = $cot->cotdet_tipo_cambio;
+
+                    $cot->cotdet_subtotal = $precio;
+                    $cot->cotdet_tipo_cambio = $dolar;
+                    $cot->save();
+                }
+                $cotizacion = Cot_Encabezado::find($context['idcotizacion']);
+                $cotizacion->cot_fecha_modificacion = hoy();
+                $cotizacion->cot_documento = $imprimir->name;
+                $cotizacion->save();
+
+
+                $titulo = 'Actualizado!!!';
+                $icon = 'success';
+                $mensaje = 'Los precios de la cotizacion fueron actualizados el tipo de cambio paso de '.'"'.$tipo_cambio.'"'.' a '.$dolar;
+            }
+            else {
+                $titulo = 'Espera!!!';
+                $icon = 'warning';
+                $mensaje = 'En esta cotizacion no se encontraron precios en dolares, al parecer todo esta en moneda nacional';
+            }
+
+            return response()->json([
+                'titulo' => $titulo,
+                'mensaje' => $mensaje,
+                'icon' => $icon
+            ], 200);
+
+        }
+
+
+        public function rechazar_cotizaciones(Request $r) {
+            $context = $r->all();
+
+            foreach ($context['cotizaciones'] as $cot) {
+                $cotizacion = Cot_Encabezado::find($cot);
+                $cotizacion->estado_cot = 'Rechazado';
+                $cotizacion->save();
+            }
+
+            $parametros = [
+                'tabla' => 'cot_encabezado',
+                'objeto_modificado' => $cotizacion->idcotizacion,
+                'idusuario' => usuario()->id,
+                'fecha' => hoy(),
+                'accion' => 'Agregar/Registrar',
+            ];
+            save_bitacora($parametros);
+
+            return response()->json([
+                'estatus' => 'OK',
+                'mensaje' => 'El estatus de las cotizaciones seleccionadas se cambio a Rechazado'
+            ]);
         }
 
 }
