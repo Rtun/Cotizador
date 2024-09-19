@@ -161,7 +161,7 @@
                         <!-- /.form-group -->
                         <div class="form-group">
                         <label>Numero De CRM:</label>
-                        <input type="text" class="form-control" v-model="crm" id="crm" placeholder="N. CRM">
+                        <input type="text" class="form-control" v-model="crm" id="crm" placeholder="N. CRM" readonly>
                         </div>
                         <!-- /.form-group -->
                     </div>
@@ -553,7 +553,7 @@
                             </thead>
                             <tbody>
                                 <tr v-for="(servicio, index_serv) in serviciosList" :key="servicio.idcotadicionales">
-                                    <td>@{{ servicio.nombre }}</td>
+                                    <td>@{{ servicio.descripcion }}</td>
                                     <td>
                                         <input type="number" class="form-control" v-model="servicio.cantidad" @input="calculateTotal_serv(index_serv)">
                                     </td>
@@ -626,10 +626,12 @@
                     modelo: '',
                     proveedor: '',
                     id: '',
+                    precio_dolar: 0,
                     costo_unidad: 0,
                     costo_desperdicio: 0,
                     costo_adicionales: 0,
                     cantidad: 1,
+                    tipo_cambio: '',
                     utilidad: '0.25',
                     unit_med: '',
                     moneda:'',
@@ -648,6 +650,7 @@
                     utilidad:'0.35',
                     unit_med: 'SRV',
                     moneda:'MXN',
+                    tipo_cambio: '',
                     precioTotal: 0,
                     adicionales: [],
                     tipo: 'SR'
@@ -678,8 +681,8 @@
                 ,cotizacion: <?php echo json_encode($cotizacionEdit);?>
             },
             mounted() {
-                this.obtener_valor_dolar();
                 this.insertarDatos();
+                this.obtener_valor_dolar();
                 $(function () {
                     // Inicializa el select2 de clientes
                     //Inicia Select2 Elements
@@ -714,26 +717,10 @@
                 $(this.$refs.textoselect).on('change', this.selectTexto);
             },
             methods: {
-                obtener_valor_dolar() {
-                    axios.get('/api/dolar/obtener')
-                    .then(response => {
-                        // El valor de la serie contiene la tasa de cambio del dólar.
-                        const valorDolar = response.data.valorDolar;
-                        console.log(`El valor del dólar es: ${valorDolar}`);
-                        this.tipo_cambio = valorDolar;
-                    })
-                    .catch(error => {
-                        console.error('Error al obtener el valor del dólar:', error);
-                        Swal.fire({
-                            title:'Error al obtener el valor del dolar',
-                            text: 'Hubo un error al obtener el tipo de cambio, se tendra que ingresar manual. porfavor notificame de este error',
-                            icon: 'error'
-                        });
-                    });
-                },
                 insertarDatos() {
                     const cotizacionId = Object.keys(this.cotizacion)[0];
                     const cotizacion = this.cotizacion[cotizacionId];
+                    console.log(cotizacion.tipo_cambio);
                     this.idcliente = cotizacion.idcliente;
                     this.cliente = cotizacion.cli_nombre;
                     this.cli_empresa = cotizacion.cli_empresa;
@@ -743,6 +730,7 @@
                     this.idconcepto = cotizacion.idtexto;
                     this.cot_concepto = cotizacion.concepto;
                     this.cot_encabezado = cotizacion.encabezado;
+                    this.tipo_cambio = cotizacion.tipo_cambio;
                     this.crm = cotizacion.crm;
                     const detalles = cotizacion.detalles;
                     detalles.forEach(element => {
@@ -759,30 +747,13 @@
                         }
                     });
                 },
-                actualizarValor() {
-                    axios.get('/api/valor-dolar')
+                obtener_valor_dolar() {
+                    axios.get('/api/dolar/obtener')
                     .then(response => {
                         // El valor de la serie contiene la tasa de cambio del dólar.
-                        const valorDolar = parseFloat(response.data.bmx.series[0].datos[0].dato);
-                        this.tipo_cambio = valorDolar + .60;
-
-                        if(valorDolar > 0) {
-                            datos = {
-                                tipo_cambio: this.tipo_cambio
-                            };
-                            axios.post('/api/dolar/save', datos).then(response => {
-                                console.log('nuevo valor => ' + response.data.valor);
-                                this.tipo_cambio = '';
-                                this.obtener_valor_dolar();
-                            }).catch(error => {
-                                console.log('este es el error que brinda el servidor => ' + error);
-                                Swal.fire({
-                                    title: 'Error',
-                                    text: 'Hubo un error al guardar el valor del tipo de cambio, pero no te preocupes sigue con tu proceso, ingresa el valor de forma manual. No olvides notificarme del error',
-                                    icon:'error'
-                                });
-                            });
-                        }
+                        const valorDolar = response.data.valorDolar;
+                        console.log(`El valor del dólar es: ${valorDolar}`);
+                        this.tipo_cambio = valorDolar;
                     })
                     .catch(error => {
                         console.error('Error al obtener el valor del dólar:', error);
@@ -865,6 +836,7 @@
                     else{
                         this.calculateTotal();
                         if(this.currentProducto.isDollar == true){
+                            this.currentProducto.precio_dolar = this.currentProducto.costo_unidad;
                             this.currentProducto.moneda = 'USD';
                             this.currentProducto.costo_u_document = this.currentProducto.costo_unidad * this.tipo_cambio;
                         }
@@ -878,6 +850,7 @@
                         if ( this.currentProducto.id == null) {
                             this.currentProducto.id = 0;
                         }
+                        this.currentProducto.tipo_cambio = this.tipo_cambio;
                         this.productosList.push({...this.currentProducto});
                         this.resetCurrentProducto();
                         $('#modal-productos').modal('hide');
@@ -959,7 +932,7 @@
                 },
                 // Servicios
                 addServicio() {
-                    if(this.servicios.nombre !== '' && this.servicios.cantidad > 0 && this.servicios.costo_unidad > 0){
+                    if(this.servicios.nombre !== ''){
                         this.servicios.costo_u_document = this.servicios.precioTotal;
                         this.serviciosList.push({...this.servicios});
                         this.resetservicios();
@@ -1083,7 +1056,7 @@
                             cot_telefono_cli: this.cli_telefono,
                             cot_correo_cli: this.cli_email,
                             crm: this.crm,
-                            show_detalle: this.show_detalle,
+                            show_detalle: this.show_detalle
                         }
                         // console.log(datos);
                         Swal.fire({

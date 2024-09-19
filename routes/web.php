@@ -36,7 +36,9 @@ Route::match(['get','post'],'/cotizacion', [CotizacionController::class, 'showFo
 Route::get('/cotizacion/editar/{idcotizacion}', [CotizacionController::class, 'showForm_editar'])->middleware('candado:COTEDITAR')->name('cotizacion.showForm_editar');
 Route::post('/cotizacion/guardar', [CotizacionController::class, 'save_form'])->name('cotizacion.save_form');
 Route::post('/cotizacion/finalizar', [CotizacionController::class, 'cerrar_cotizacion'])->middleware('candado:COTFINALIZAR')->name('cotizacion.cerrar');
+Route::post('/cotizacion/actualizar/precios', [CotizacionController::class, 'actualizar_precios'])->middleware('candado:COTACTPRECIOS');
 Route::get('/cotizacion/obtener_clientes', [CotizacionController::class, 'getClientes']);
+Route::post('/cotizacion/rechazar', [CotizacionController::class, 'rechazar_cotizaciones']);
 Route::get('/cotizacion/prueba', [CotizacionController::class, 'prueba']);
 
 // catalogos clientes
@@ -48,6 +50,8 @@ Route::post('/catalogos/clientes/save', [ClienteController::class, 'save_form'])
 Route::get('/catalogos/listado/productos', [ProductosController::class, 'listado'])->middleware('candado:PRODUCTOS')->name('catalogos.listado_productos');
 Route::match(['get', 'post'],'/catalogos/form-productos', [ProductosController::class, 'form_productos'])->middleware('candado:FORMPRODUCTO')->name('catalogos.form_productos');
 Route::post('/catalogos/form-produdctos/save', [ProductosController::class, 'save_productos'])->name('catalogos.save_productos');
+Route::get('/catalogos/buscar/productos', [ProductosController::class, 'buscarProductos'])->name('catalogos.buscar_productos');
+Route::post('/catalogos/productos/api/save', [ProductosController::class, 'api_save_producto'])->name('catalogos.prod_api_save');
 
 // catalogos adicionales
 Route::get('/catalogos/listado/adicionales', [AdicionalesController::class, 'listado'])->middleware('candado:ADICIONALES')->name('catalogos.listado_adicionales');

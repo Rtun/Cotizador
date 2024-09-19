@@ -8,8 +8,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Comsitec | System</title>
+<<<<<<< HEAD
   <link rel="icon" href="{{ asset('LOGO COMSITEC.png') }}" type="image/x-icon">
 
+=======
+  {{-- <link rel="icon" href="{{ asset('LOGO COMSITEC.png') }}" type="image/x-icon"> --}}
+>>>>>>> 6490291740f0800451d0b1c028917e37b92785b7
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome Icons -->
