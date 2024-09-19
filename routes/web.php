@@ -122,9 +122,10 @@ Route::get('/registrarse', [RegisterController::class, 'index'])->middleware('gu
 Route::post('/registro', [RegisterController::class, 'store'])->middleware('guest')->name('register.store');
 
 //pruebas
-// Route::get('/check-memory-limit', function () {
-//     return ini_get('memory_limit');
-// });
+Route::get('/check-memory-limit', function () {
+    // return ini_get('memory_limit');
+    phpinfo();
+});
 
 //}Apis que no requieren iniciar sesion para funcionar
 Route::get('/api/valor-dolar', function () {

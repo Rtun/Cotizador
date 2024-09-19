@@ -553,7 +553,8 @@
                             </thead>
                             <tbody>
                                 <tr v-for="(servicio, index_serv) in serviciosList" :key="servicio.idcotadicionales">
-                                    <td>@{{ servicio.descripcion }}</td>
+                                    <td v-if="servicio.descripcion">@{{ servicio.descripcion }}</td>
+                                    <td v-else>@{{ servicio.nombre }}</td>
                                     <td>
                                         <input type="number" class="form-control" v-model="servicio.cantidad" @input="calculateTotal_serv(index_serv)">
                                     </td>
@@ -641,7 +642,7 @@
                 },
                 index_adicional: null,
                 servicios: {
-                    id: 10,
+                    id: 1,
                     nombre: '',
                     cantidad: 0,
                     costo_unidad: 0,
@@ -934,6 +935,7 @@
                 addServicio() {
                     if(this.servicios.nombre !== ''){
                         this.servicios.costo_u_document = this.servicios.precioTotal;
+                        this.servicios.tipo_cambio = this.tipo_cambio;
                         this.serviciosList.push({...this.servicios});
                         this.resetservicios();
                         $('#modal-lg').modal('hide');
@@ -948,7 +950,7 @@
                 resetservicios() {
                     // restaura los valores para agregar el siguiente
                     this.servicios = {
-                        id: 10,
+                        id: 1,
                         nombre: '',
                         cantidad: 0,
                         costo_unidad: 0,

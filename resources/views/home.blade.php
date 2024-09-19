@@ -74,7 +74,7 @@ Inicio
       <!-- /.row -->
     </div><!-- /.container-fluid -->
     <br>
-        <div class="alert alert-danger" v-if="mensaje">
+        <div class="alert alert-danger" v-show="mensaje">
             <center>
                 @{{ getMensaje }}
             </center>

@@ -20,6 +20,7 @@ class ProductosController extends Controller
                                     ->select(
                                         "idproductos",
                                         "prod_cve",
+                                        "prod_cve_syscom",
                                         "prod_nombre",
                                         "prod_medicion",
                                         "prod_precio_brut",
@@ -126,7 +127,8 @@ class ProductosController extends Controller
     public function api_save_producto(Request $r) {
         $context = $r->all();
 
-        switch ($context['key']) {
+        if($context['operacion'] == 'Agregar'){
+            switch ($context['key']) {
             case 'syscom':
                 $marca = Marca::where('m_nombre', $context['idmarca'])->first();
                 $proveedor = Proveedor::where('prv_nombre', $context['idproveedor'])->first();
@@ -175,6 +177,7 @@ class ProductosController extends Controller
                 dd('todo esto viene de tvc');
                 break;
         }
+    }
 
         return redirect()->to('/catalogos/listado/productos');
     }

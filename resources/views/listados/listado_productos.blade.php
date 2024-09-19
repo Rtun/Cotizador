@@ -27,22 +27,19 @@
           <th>Proveedor</th>
           <th>Medicion</th>
           <th>Precio</th>
-          <th>Usuario Alta</th>
-          <th>Fecha Alta</th>
           <th>Tipo</th>
         </tr>
         </thead>
         <tbody>
         <tr v-for="elemento in productos">
           <td><a :href="url_editar+'?idproducto='+elemento.idproductos">@{{elemento.prod_nombre}}</a></td>
-          <td>@{{elemento.prod_cve_producto}}</td>
+          <td v-if="elemento.prod_cve != null">@{{elemento.prod_cve}}</td>
+          <td v-else>@{{elemento.prod_cve_syscom}}</td>
           <td>@{{elemento.marca}}</td>
           <td>@{{elemento.modelo}}</td>
           <td>@{{elemento.proveedor}}</td>
           <td>@{{elemento.prod_medicion}}</td>
-          <td>@{{elemento.prod_precio_brut}}</td>
-          <td>@{{elemento.nombre_usuario}}</td>
-          <td>@{{elemento.fecha_creacion}}</td>
+          <td>@{{parseFloat(elemento.prod_precio_brut)}}</td>
           <td>@{{elemento.prod_tipo}}</td>
         </tr>
         </tfoot>

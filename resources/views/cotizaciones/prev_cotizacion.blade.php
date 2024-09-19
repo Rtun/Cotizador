@@ -687,7 +687,7 @@
                 },
                 index_adicional: null,
                 servicios: {
-                    id: 10,
+                    id: 1,
                     nombre: '',
                     cantidad: 0,
                     costo_unidad: 0,
@@ -1013,7 +1013,7 @@
                 resetservicios() {
                     // restaura los valores para agregar el siguiente
                     this.servicios = {
-                        id: 10,
+                        id: 1,
                         nombre: '',
                         cantidad: 0,
                         costo_unidad: 0,
