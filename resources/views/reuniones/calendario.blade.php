@@ -138,7 +138,7 @@ Calendario
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cerrar</button>
-                    <button type="button" class="btn btn-danger" @click="eliminarEvento(modalEvent.idevento)">Eliminar</button>
+                    <button v-if="modalEvent.idusuario === usuario.id" type="button" class="btn btn-danger" @click="eliminarEvento(modalEvent.idevento)">Eliminar</button>
                 </div>
             </div>
         </div>
@@ -162,6 +162,7 @@ Calendario
         el: '#app',
         data: {
             sala:<?php echo json_encode($sala);?>,
+            usuario: <?php echo json_encode($usuario);?>,
             newEvent: {
                 idevento: '',
                 title: '',
@@ -263,6 +264,7 @@ Calendario
                     const eventos = response.data.eventos;
                     eventos.forEach(evento => {
                         this.calendar.addEvent({
+                            idusuario: evento.idusuario,
                             idevento: evento.idreunion,
                             title: evento.sare_tema,
                             start: evento.sare_fecha_inicio,
@@ -403,6 +405,7 @@ Calendario
             mostrarModal(event) {
                 // Llenar los datos del evento en la variable modalEvent
                 this.modalEvent = {
+                    idusuario: event.extendedProps.idusuario,
                     idevento: event.extendedProps.idevento,
                     title: event.title,
                     start: event.start.toISOString(),  // Formato de la fecha para mostrar

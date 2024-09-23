@@ -6,6 +6,7 @@ use App\Models\Reuniones;
 use App\Models\Salas;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ReunionesController extends Controller
@@ -14,7 +15,7 @@ class ReunionesController extends Controller
         $salas = Salas::all();
 
         $informacion = [
-            'sala' => $salas
+            'sala' => $salas,
         ];
 
         return view('listados.listado_salas')->with($informacion);
@@ -97,8 +98,11 @@ class ReunionesController extends Controller
 
     public function show_calendario () {
         $salas = Salas::where('sa_status', 'AC')->get()->toArray();
+        $usuario = Auth::user();
+
         $informacion = [
-            'sala' => $salas
+            'sala' => $salas,
+            'usuario' => $usuario
         ];
         return view('reuniones.calendario')->with($informacion);
     }
@@ -122,6 +126,7 @@ class ReunionesController extends Controller
                             "idreunion",
                             "salas.sa_nombre as sala",
                             "users.name as usuario",
+                            "sa_reunion.idusuario as idusuario",
                             "sare_tema",
                             "sare_descripcion",
                             DB::raw("DATE_FORMAT(sare_fecha_inicio, '%Y-%m-%dT%H:%i:%s') as sare_fecha_inicio"),
