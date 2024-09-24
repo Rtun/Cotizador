@@ -4,6 +4,10 @@
 Calendario
 @endsection
 
+@section('modulo')
+    Calendario
+@endsection
+
 @section('styles')
 <link rel="stylesheet" href="{{asset('plugins/fullcalendar/main.css')}}">
 @endsection

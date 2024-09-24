@@ -28,6 +28,8 @@ use Illuminate\Support\Facades\Http;
 Route::middleware(['auth', 'auth.status'])->group(function () {
 Route::get('/pruebas',[PruebaController::class, 'index'])->name('prueba');
 Route::get('/', [LoginController::class, 'inicio'])->name('inicio');
+Route::get('/perfil/usuario', [LoginController::class, 'perfilData'])->name('perfil');
+Route::post('/perfil/actualizar/datos', [RegisterController::class, 'actualizar_datos'])->name('perfil.actualizar');
 //Cotizaciones
 Route::get('/cotizacion/listado', [CotizacionController::class, 'listado_cotizaciones'])->middleware('candado:COTIZACIONES')->name('cotizacion.listado');
 Route::get('/cotizacion/listado/{crm}', [CotizacionController::class, 'cotizacion_x_crm'])->middleware('candado:COTIZACRM')->name('cotizacion.listado_crm');

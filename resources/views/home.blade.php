@@ -4,6 +4,9 @@
 Inicio
 @endsection
 
+@section('modulo')
+    Inicio
+@endsection
 
 @section('content')
 <section class="content" id="app">
@@ -74,12 +77,11 @@ Inicio
       <!-- /.row -->
     </div><!-- /.container-fluid -->
     <br>
-        <div class="alert alert-danger" v-show="mensaje">
-            <center>
-                @{{ getMensaje }}
-            </center>
-        </div>
-
+    <div class="alert alert-danger" v-show="hayMensaje">
+        <center>
+            @{{ getMensaje }}
+        </center>
+    </div>
 
     <div class="modal fade" id="modal-lg" style="display: block; padding-right: 17px;" aria-modal="true" role="dialog">
         <div class="modal-dialog modal-lg">
@@ -149,7 +151,8 @@ Inicio
                 N_reuniones: <?php echo json_encode($N_reuniones);?>,
                 pendientes: <?php echo json_encode($pendientes);?>,
                 idcotizacion: [],
-                mensaje: false,
+                hayMensaje: false,
+                mensaje: '',
                 getMensaje: ''
             },
             mounted() {
@@ -203,7 +206,7 @@ Inicio
                             if (result.isConfirmed) {
                                 axios.post('/cotizacion/rechazar', datos).then(response => {
                                     if(response.data.estatus == 'OK') {
-                                        this.mensaje = true;
+                                        this.hayMensaje = true;
                                         this.getMensaje = response.data.mensaje;
                                         $('#modal-lg').modal('hide');
 

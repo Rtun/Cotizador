@@ -4,6 +4,9 @@
     Agregar Proveedores
 @endsection
 
+@section('modulo')
+    Proveedores
+@endsection
 
 @section('content')
 <div class="card card-default" id="app">

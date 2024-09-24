@@ -4,6 +4,9 @@
     Agregar Adicional
 @endsection
 
+@section('modulo')
+    Adicionales
+@endsection
 
 @section('content')
 <div class="card card-default" id="app">

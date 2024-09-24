@@ -4,6 +4,10 @@
     Agregar Producto
 @endsection
 
+@section('modulo')
+    Productos
+@endsection
+
 @section('styles')
     <style>
         .producto-opcion {

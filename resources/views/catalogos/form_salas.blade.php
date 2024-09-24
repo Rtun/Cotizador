@@ -4,6 +4,9 @@
     Agregar Sala
 @endsection
 
+@section('modulo')
+    Salas
+@endsection
 
 @section('content')
 <div class="card card-default" id="app">

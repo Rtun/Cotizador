@@ -4,6 +4,10 @@
     Listado Salas
 @endsection
 
+@section('modulo')
+    Salas
+@endsection
+
 @section('content')
 <div class="card" id="app">
     <div class="card-header">

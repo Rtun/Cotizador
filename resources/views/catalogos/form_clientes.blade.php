@@ -4,6 +4,9 @@
     Agregar Clientes
 @endsection
 
+@section('modulo')
+    Clientes
+@endsection
 
 @section('content')
 <div class="card card-default" id="app">

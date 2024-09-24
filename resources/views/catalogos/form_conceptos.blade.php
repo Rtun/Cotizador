@@ -4,6 +4,9 @@
     Agregar Conceptos
 @endsection
 
+@section('modulo')
+    Conceptos
+@endsection
 
 @section('content')
 <div class="card card-default" id="app">

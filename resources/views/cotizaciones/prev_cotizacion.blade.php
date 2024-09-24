@@ -4,6 +4,10 @@
     Cotización
 @endsection
 
+@section('modulo')
+    Cotizaciones
+@endsection
+
 @section('content')
 <!-- /.inicio de la card -->
 <div class="card card-default" id="app">

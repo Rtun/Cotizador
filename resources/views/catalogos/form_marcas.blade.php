@@ -4,6 +4,9 @@
     Agregar Marcas
 @endsection
 
+@section('modulo')
+    Marcas
+@endsection
 
 @section('content')
 <div class="card card-default" id="app">

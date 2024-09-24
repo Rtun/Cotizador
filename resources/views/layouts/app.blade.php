@@ -7,7 +7,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Comsitec | System</title>
+  <title>Comsitec | @yield('modulo')</title>
   <link rel="icon" href="{{ asset('LOGO COMSITEC.png') }}" type="image/x-icon">
 
   <!-- Google Font: Source Sans Pro -->
@@ -96,7 +96,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
       </div>
     </div>
   </div>
-    @include('layouts.rigthsidebar')
 </div>
 <footer class="main-footer">
   <div class="float-right d-none d-sm-inline">
@@ -119,15 +118,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="{{asset('plugins/select2/js/select2.full.min.js')}}"></script>
 <!-- Bootstrap4 Duallistbox -->
 <script src="{{asset('plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js')}}"></script>
-<!-- InputMask -->
-<script src="{{asset('plugins/moment/moment.min.js')}}"></script>
-<script src="{{asset('plugins/inputmask/jquery.inputmask.min.js')}}"></script>
-<!-- date-range-picker -->
-<script src="{{asset('plugins/daterangepicker/daterangepicker.js')}}"></script>
-<!-- bootstrap color picker -->
-<script src="{{asset('plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js')}}"></script>
-<!-- Tempusdominus Bootstrap 4 -->
-<script src="{{asset('plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js')}}"></script>
+
 <!-- Bootstrap Switch -->
 <script src="{{asset('plugins/bootstrap-switch/js/bootstrap-switch.min.js')}}"></script>
 <!-- BS-Stepper -->
@@ -144,20 +135,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="{{asset('plugins/toastr/toastr.min.js')}}"></script>
 <script src="{{asset('vue.js')}}"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
-<!--Tablas-->
-<script src="{{asset('plugins/datatables/jquery.dataTables.min.js')}}"></script>
-<script src="{{asset('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
-<script src="{{asset('plugins/datatables-responsive/js/dataTables.responsive.min.js')}}"></script>
-<script src="{{asset('plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
-<script src="{{asset('plugins/datatables-buttons/js/dataTables.buttons.min.js')}}"></script>
-<script src="{{asset('plugins/datatables-buttons/js/buttons.bootstrap4.min.js')}}"></script>
-<script src="{{asset('plugins/jszip/jszip.min.js')}}"></script>
-<script src="{{asset('plugins/pdfmake/pdfmake.min.js')}}"></script>
-<script src="{{asset('plugins/pdfmake/vfs_fonts.js')}}"></script>
-<script src="{{asset('plugins/datatables-buttons/js/buttons.html5.min.js')}}"></script>
-<script src="{{asset('plugins/datatables-buttons/js/buttons.print.min.js')}}"></script>
-<script src="{{asset('plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
 <script>
     new Vue({
         el: '#navbar-app',
