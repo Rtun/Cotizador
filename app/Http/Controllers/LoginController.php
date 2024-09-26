@@ -7,6 +7,7 @@ use App\Models\Cot_Encabezado;
 use App\Models\Cot_Producto;
 use App\Models\Reuniones;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,23 +25,41 @@ class LoginController extends Controller
             ]);
 
         }
-        // return view('home', ['user' => $user]);
         return redirect()->to('/');
     }
 
     public function destroy() {
+        // $usernameDataCrm = session('dataCRM_sessionName');
+
+        // if($usernameDataCrm) {
+        //     $client = new Client();
+
+        //     // Paso 1: Obtener el Token
+        //     $response = $client->request('POST', 'https://www.datacrm.la/datacrm/comsitec/webservice.php?', [
+        //         'form_params' => [
+        //             'operation' => 'logout',//peticion
+        //             'sessionName' => $usernameDataCrm,//nombre de sesion
+        //         ],
+        //         'verify' => 'C:\wamp64\www\certificado', //sertificado SSl
+        //     ]);
+
+        //     $challenge = json_decode($response->getBody()->getContents(), true);
+        //     if($challenge['success']) {
+        //         session()->forget('dataCRM_sessionName');
+        //     }
+        // }
         auth()->logout();
         return redirect()->to('/login');
     }
 
     public function inicio() {
-        $getproductos = Cot_Producto::where('status', 'AC')->get();
-        $getadicionales = Adicionales::where('status', 'AC')->get();
-        $getcotizaciones = Cot_Encabezado::where('status', 'AC')
-                                        ->where('idusuario', usuario()->id)->get();
-        $getreuniones = Reuniones::where('sare_fecha_inicio','>=', hoy())
+        $productos = Cot_Producto::where('status', 'AC')->count();
+        $adicionales = Adicionales::where('status', 'AC')->count();
+        $cotizaciones = Cot_Encabezado::where('status', 'AC')
+                                        ->where('idusuario', usuario()->id)->count();
+        $reuniones = Reuniones::where('sare_fecha_inicio','>=', hoy())
                                     ->where('sare_status', 'AC')
-                                    ->get();
+                                    ->count();
 
         $fechaLimite = Carbon::now()->subMonth(); //calcula la fecha de hace un mes
         $pendientes = DB::table('cot_encabezado')
@@ -62,10 +81,6 @@ class LoginController extends Controller
                         ->whereNotIn('estado_cot', ['Finalizado', 'Rechazado']) //verifica que el estado no este en ninguno de los dos
                         ->get()->toArray();
 
-        $productos = count($getproductos);
-        $adicionales = count($getadicionales);
-        $cotizaciones = count($getcotizaciones);
-        $reuniones = count($getreuniones);
         $informacion = [
             'pendientes' => $pendientes,
             'N_productos' => $productos,

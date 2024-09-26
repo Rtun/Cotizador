@@ -49,7 +49,7 @@
                     </label>
                     </div>
                     <div class="icheck-success d-inline">
-                    <input v-model="formulario" type="radio" name="r3" id="radioSuccess3" value="Tvc">
+                    <input v-model="formulario" type="radio" name="r3" id="radioSuccess3" value="Tvc" disabled>
                     <label for="radioSuccess3">
                         Tvc
                     </label>

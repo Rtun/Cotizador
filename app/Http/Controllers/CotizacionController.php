@@ -27,36 +27,8 @@ use Illuminate\Support\Facades\Storage;
 
 class CotizacionController extends Controller
 {
-    private function obtener_Token_syscom() {
-        $client_id = 'aPYL5OpJ1RjJRtkgg7pwFOWUdSa4W0Yd';
-        $client_secret = '5a8lDX2zMZ7RUbP7coJPyqJCMkaoTqeYNdQuvz8L';
-        $response = Http::post('https://developers.syscom.mx/oauth/token',[
-            'grant_type' => 'client_credentials',
-            'client_id' => 'aPYL5OpJ1RjJRtkgg7pwFOWUdSa4W0Yd',
-            'client_secret' => '5a8lDX2zMZ7RUbP7coJPyqJCMkaoTqeYNdQuvz8L'
-        ]);
-
-        return $response->json();
-
-        dd($response, $response['access_token']);
-    }
-
     public function pruebas () {
-    //    $dollar = file_get_contents("https://mx.dolarapi.com/v1/cotizaciones/usd");
-    //    dd($dollar);
-        $token = $this->obtener_Token_syscom();
-        // dd($token['access_token']);
-        $obtener_productos = Http::withHeaders([
-            'Authorization' => 'Bearer '.$token['access_token'],
-            'Accept' => 'application/json',
-        ])->get('https://developers.syscom.mx/api/v1/categorias/206');
-            dd($obtener_productos);
-        if ($obtener_productos->successful()) {
-            $products = $obtener_productos->json();
-            dd($products);
-        } else {
-            return response()->json(['error' => 'No se pudieron obtener los productos'], $obtener_productos->status());
-        }
+       dd('controller para hacer pruebas de todo tipo');
     }
 
     private function obtener_Token() {//este metodo obtiene el token de la api por medio del login
@@ -78,12 +50,12 @@ class CotizacionController extends Controller
         }
 
         $token = $challenge['result']['token'];
-        $accessKey = md5($token . 'dVfN6UTR9K2d9ZvA'); //aca va la access key de la cuenta del dataCRM
+        $accessKey = md5($token . env('DATA_CRM_API_KEY')); //aca va la access key de la cuenta del dataCRM
         // Paso 2: Hacer la solicitud de inicio de sesión
         $response = $client->request('POST', 'https://www.datacrm.la/datacrm/comsitec/webservice.php?', [
             'form_params' => [
                 'operation' => 'login',//tipo de peticion
-                'username' => 'Ismael Patino',
+                'username' => env('DATA_CRM_USER_NAME'),
                 'accessKey' => $accessKey,
             ],
             'verify' => 'C:\wamp64\www\certificado', //Sertificado SSL
@@ -142,7 +114,7 @@ class CotizacionController extends Controller
         //     $sessionName = $this->obtener_Token();
         // }
 
-        // Solicitud para obtener los clientes
+        // // Solicitud para obtener los clientes
         $clientes_CRM = [];
         // $page = 0;
         // $limit = 100; // Límite de registros por página
@@ -174,7 +146,6 @@ class CotizacionController extends Controller
         $utilidad = TipoServicio::where('status','AC')->get()->toArray();
         $adicional = Adicionales::where('status', 'AC')->get()->toArray();
         $textos = Concepto::where('con_status', 'AC')->get()->toArray();
-        // $dollar = file_get_contents("https://mx.dolarapi.com/v1/cotizaciones/usd");
 
         // fin de la informacion del asesor
         $informacion = array();
@@ -475,7 +446,6 @@ class CotizacionController extends Controller
         return response()->json([
             'status' => 'OK',
             'message' => 'Cotización guardada con éxito',
-            // 'data' => $context,
             'file' => url('/descargar-cotizacion/'.$safeFilename)
 
         ], 201);
@@ -577,33 +547,22 @@ class CotizacionController extends Controller
 
     public function listado_cotizaciones () {
         //Este metodo muestra y agrupa las consultas por numero de crm
-        if(usuario()->idrol === 1) {
-            $cotizaciones = DB::table('cot_encabezado')
+        $rol = usuario()->idrol;
+            $consulta = DB::table('cot_encabezado')
                             ->join('users', 'id','=','cot_encabezado.idusuario')
                             ->join('cot_clientes', 'idclientes','=','cot_encabezado.idcliente')
                             ->select(
                                 "cot_num_crm as crm",
+                                "users.name as usuario",
                                 DB::raw('GROUP_CONCAT(DISTINCT cot_clientes.cli_nombre SEPARATOR ", ") as cliente'),
                                 DB::raw('GROUP_CONCAT(DISTINCT cot_clientes.cli_empresa SEPARATOR ", ") as empresa')
                                 )
-                                ->where('cot_encabezado.status', 'AC')
-                                ->groupBy('cot_encabezado.cot_num_crm')
-                                ->get()->toArray();
-        }
-        else{
-            $cotizaciones = DB::table('cot_encabezado')
-                            ->join('users', 'id','=','cot_encabezado.idusuario')
-                            ->join('cot_clientes', 'idclientes','=','cot_encabezado.idcliente')
-                            ->select(
-                                "cot_num_crm as crm",
-                                DB::raw('GROUP_CONCAT(DISTINCT cot_clientes.cli_nombre SEPARATOR ", ") as cliente'),
-                                DB::raw('GROUP_CONCAT(DISTINCT cot_clientes.cli_empresa SEPARATOR ", ") as empresa')
-                                )
-                                ->where('cot_encabezado.idusuario', usuario()->id)
-                                ->where('cot_encabezado.status', 'AC')
-                                ->groupBy('cot_encabezado.cot_num_crm')
-                                ->get()->toArray();
-        }
+                                ->where('cot_encabezado.status', 'AC');
+            if($rol != 1) {
+                $consulta->where('idusuario', usuario()->id);
+            }
+            $cotizaciones = $consulta->groupBy('cot_encabezado.cot_num_crm','users.name')->get()->toArray();
+
         $informacion = array();
         $informacion['cotizaciones'] = $cotizaciones;
         $informacion['usuario'] = usuario();
@@ -612,13 +571,13 @@ class CotizacionController extends Controller
 
     public function cotizacion_x_crm ($crm) {
         //Este metodo realiza la consulta con el numero de crm seleccionado desde el front y devuelve una segunda vista con el resultados
-        if (usuario()->idrol === 1) {
-            $cotizaciones = DB::table('cot_encabezado')
+        $rol = usuario()->idrol;
+        $consulta = DB::table('cot_encabezado')
                             ->join('users', 'id','=','cot_encabezado.idusuario')
                             ->join('cot_clientes', 'idclientes','=','cot_encabezado.idcliente')
                             ->select(
                                 "idcotizacion",
-                               "users.name as user_nombre",
+                               "users.name as usuario",
                                "cot_clientes.cli_nombre as cliente",
                                "cot_num_crm as crm",
                                "cot_encabezado as encabezado",
@@ -629,36 +588,17 @@ class CotizacionController extends Controller
                                 DB::Raw("DATE_FORMAT(cot_fecha_modificacion,'%d-%m-%Y') as fecha_modificacion"),
                                 DB::Raw("DATE_FORMAT(cot_fecha_cierre,'%d-%m-%Y') as fecha_cierre"))
                             ->where('cot_num_crm', $crm)
-                            ->where('cot_encabezado.status', 'AC')
-                            ->get()
-                            ->toArray();
+                            ->where('cot_encabezado.status', 'AC');
+        if ($rol != 1) {
+            $consulta->where('idusuario', usuario()->id);
         }
-        else{
-            $cotizaciones = DB::table('cot_encabezado')
-                            ->join('users', 'id','=','cot_encabezado.idusuario')
-                            ->join('cot_clientes', 'idclientes','=','cot_encabezado.idcliente')
-                            ->select(
-                                "idcotizacion",
-                               "users.name as user_nombre",
-                               "cot_clientes.cli_nombre as cliente",
-                               "cot_num_crm as crm",
-                               "cot_encabezado as encabezado",
-                               "cot_prod_cantidad as conteo",
-                               "cot_documento as documento",
-                               "estado_cot",
-                                DB::Raw("DATE_FORMAT(cot_fecha_creacion,'%d-%m-%Y') as fecha_creacion"),
-                                DB::Raw("DATE_FORMAT(cot_fecha_modificacion,'%d-%m-%Y') as fecha_modificacion"),
-                                DB::Raw("DATE_FORMAT(cot_fecha_cierre,'%d-%m-%Y') as fecha_cierre"))
-                            ->where('cot_num_crm', $crm)
-                            ->where('cot_encabezado.idusuario', usuario()->id)
-                            ->where('cot_encabezado.status', 'AC')
-                            ->get()
-                            ->toArray();
-        }
+        $cotizaciones = $consulta->get()->toArray();
+
         // dd($cotizaciones, 'este es mi hello world');
         $informacion = array();
         $informacion['cotizaciones'] = $cotizaciones;
         $informacion['crm'] = $crm;
+        $informacion['usuario'] = usuario();
         return view('cotizaciones.listadoxcrm')->with($informacion);
     }
 

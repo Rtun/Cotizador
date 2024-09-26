@@ -29,6 +29,7 @@
         <thead>
         <tr>
           <th>Nombre de Cliente</th>
+          <th v-if="usuario.idrol == 1">Personal</th>
           <th>Empresa</th>
           <th>N. CRM</th>
         </tr>
@@ -36,6 +37,7 @@
         <tbody>
         <tr v-for="elemento in cotizaciones">
           <td>@{{elemento.cliente}}</td>
+          <td v-if="usuario.idrol == 1">@{{elemento.usuario}}</td>
           <td>@{{elemento.empresa}}</td>
           <td><a :href="url_buscar+'/'+elemento.crm">@{{elemento.crm}}</a></td>
         </tr>
@@ -68,6 +70,7 @@
             el:'#app',
             data:{
                 cotizaciones:<?php echo json_encode($cotizaciones);?>
+                ,usuario: <?php echo json_encode($usuario)?>
                 ,url_buscar: "{{url('/cotizacion/listado/')}}"
                 ,redirigiendo: false
             },

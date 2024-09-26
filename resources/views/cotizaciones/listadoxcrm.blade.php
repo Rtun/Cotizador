@@ -38,6 +38,7 @@
         <thead>
             <tr>
                 <th>Nombre de Cliente</th>
+                <th v-if="usuario.idrol == 1">Personal</th>
                 <th>N. CRM</th>
                 <th>Concepto</th>
                 <th>Fecha de Creacion</th>
@@ -51,6 +52,7 @@
         <tbody>
             <tr v-for="elemento in cotizaciones">
                 <td>@{{elemento.cliente}}</td>
+                <td v-if="usuario.idrol">@{{elemento.usuario}}</td>
                 <td>@{{elemento.crm}}</td>
                 <td>@{{elemento.encabezado}}</td>
                 <td>@{{elemento.fecha_creacion}}</td>
@@ -286,6 +288,7 @@
             el:'#app',
             data:{
                 cotizaciones:<?php echo json_encode($cotizaciones);?>
+                ,usuario: <?php echo json_encode($usuario)?>
                 ,url_descargar: "{{url('/descargar-cotizacion/')}}"
                 ,url_detalle: "{{url('/cotizacion/listado/detalle/')}}"
                 ,url_editar: "{{url('/cotizacion/editar')}}"
