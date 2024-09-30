@@ -6,6 +6,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CotizacionController;
 use App\Http\Controllers\GlobalController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\MailController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\ProveedorController;
@@ -15,11 +16,12 @@ use App\Http\Controllers\ReunionesController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\RolxPermisoController;
 use App\Http\Controllers\TextosController;
+use App\Mail\ReunionMailable;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
-
-
+use Illuminate\Support\Facades\Mail;
 
 // Route::get('/', function () {
 //     return view('home');
@@ -94,6 +96,26 @@ Route::get('/descargar-cotizacion/{file}', function ($file) {
         abort(404);
     }
     return response()->download($path);
+});
+
+//Mails
+Route::post('/enviar/cotizacion/{idcotizacion}', [MailController::class, 'enviar_cotizacion'])->name('enviar.cotizacion');
+Route::get('/reuniones', function() {
+    $usuarios = User::where('status', 'AC')->get();
+    foreach ($usuarios as $user) {
+        if($user->idrol == 1) {
+            $subject = 'Administrador';
+        }
+        else {
+            $subject = 'No es administrador';
+        }
+        $context = new \stdClass();
+        $context->usuario = $user->name;
+        $context->email = $user->email;
+        $context->contenido = 'Este es el contenido solo te notificamos que hay una nueva reunion agendada';
+        Mail::to($user->email)->send(new ReunionMailable($context, $subject));
+    }
+    return 'Mensajes enviados';
 });
 
 //Rutas de administrador

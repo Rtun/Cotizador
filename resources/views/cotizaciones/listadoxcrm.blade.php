@@ -47,6 +47,7 @@
                 <th>N. cotizados</th>
                 <th>Documeto</th>
                 <th>Elementos</th>
+                <th>Enviar</th>
             </tr>
         </thead>
         <tbody>
@@ -63,7 +64,13 @@
                 <td><button class="btn btn-success" @click="descargar_doc(elemento.documento)"><i class="fas fa-cloud-download-alt"></i></button></td>
                 <td>
                     <button class="btn btn-primary" data-toggle="modal" data-target="#modal-detalles" @click="mostrar_detalle(elemento.idcotizacion)"><i class="fas fa-eye"></i></button>
-                    <button id="editar" class="btn btn-warning"><i class="fas fa-pencil-alt" @click="copiarCot(elemento.idcotizacion)"></i></button>
+                    <button id="editar" class="btn btn-warning" @click="copiarCot(elemento.idcotizacion)"><i class="fas fa-pencil-alt"></i></button>
+                </td>
+                <td>
+                    <button v-show="!enviando" class="btn btn-primary" id="enviar" @click="enviarCotizacion(elemento.idcotizacion)"><i class="fas fa-paper-plane"></i></button>
+                    <div v-show="enviando" class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
                 </td>
             </tr>
         </tfoot>
@@ -292,8 +299,10 @@
                 ,url_descargar: "{{url('/descargar-cotizacion/')}}"
                 ,url_detalle: "{{url('/cotizacion/listado/detalle/')}}"
                 ,url_editar: "{{url('/cotizacion/editar')}}"
+                ,url_enviar: "{{url('/enviar/cotizacion/')}}"
                 ,adicionalesList:[]
                 ,datosList : {}
+                ,enviando: false
             },
             mounted() {
                 $(function () {
@@ -488,6 +497,46 @@
                                 });
                             }
                         });
+                },
+                enviarCotizacion(id) {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: "btn btn-success",
+                            cancelButton: "btn btn-danger"
+                        },
+                        buttonsStyling: false
+                    });
+                    swalWithBootstrapButtons.fire({
+                        title: "Estas seguro?",
+                        text: "Quieres enviar este documento al cliente?, si hiciste modificaciones al documento. se recomienda redactar y enviar el correo de forma manual al cliente.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Si, enviar!",
+                        cancelButtonText: "No, cancelar!",
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.enviando = true;
+                            let url = this.url_enviar + '/' + id;
+
+                            axios.post(url).then(response => {
+                                Swal.fire({
+                                    title: 'Hecho',
+                                    text:'La cotizacion a sido enviada al cliente via correo',
+                                    icon: 'success'
+                                }).then(result => {
+                                    this.enviando = false;
+                                });
+                            }).catch(error => {
+                                console.log('Este es el error que brinda el servidor => ' + error);
+                                Swal.fire({
+                                    title:'Error',
+                                    text: 'Ha ocurrido un error al enviar el correo, por favor contactame',
+                                    icon: 'error'
+                                });
+                            });
+                        }
+                    });
                 }
             },
         });

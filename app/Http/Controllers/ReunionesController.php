@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ReunionMailable;
 use App\Models\Reuniones;
 use App\Models\Salas;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class ReunionesController extends Controller
 {
@@ -202,6 +205,27 @@ class ReunionesController extends Controller
                 'accion' => 'Guardar/Create',
             ];
             save_bitacora($parametros);
+
+            $fecha_inicio = Carbon::parse($reuniones->sare_fecha_inicio);
+            $fecha_fin = Carbon::parse($reuniones->sare_fecha_fin);
+
+            //envio de correo
+            $sala = Salas::where('idsala', $reuniones->idsala)->first();
+            $usuarios = User::where('status', 'AC')->get();
+            $mail = new \stdClass();
+            $mail->titulo = 'Confirmación de Reunion';
+            $mail->mensaje = 'hay una nueva reunion agendada';
+            $mail->sala = $sala->sa_nombre;
+            $mail->tema = $reuniones->sare_tema;
+            $mail->fecha_inicio = $fecha_inicio->format('d \d\e F \d\e Y, H:i');;
+            $mail->fecha_fin = $fecha_fin->format('d \d\e F \d\e Y, H:i');;
+            $mail->contenido = $reuniones->sare_descripcion;
+            $subject = 'Reunion Agendada';
+            // Mail::to('russelltun.ek@gmail.com')->send(new ReunionMailable($mail, $subject));
+            foreach ($usuarios as $user) {
+                $mail->usuario = $user->name;
+                Mail::to($user->email)->send(new ReunionMailable($mail, $subject));
+            }
         }
 
         return response()->json([
@@ -227,6 +251,25 @@ class ReunionesController extends Controller
         ];
         save_bitacora($parametros);
 
+        //envio de correo
+        $fecha_inicio = Carbon::parse($reunion->sare_fecha_inicio);
+        $fecha_fin = Carbon::parse($reunion->sare_fecha_fin);
+        $sala = Salas::where('idsala', $reunion->idsala)->first();
+        $mail = new \stdClass();
+        $mail->titulo = 'Cancelación de Reunion';
+        $mail->mensaje = 'se a cancelado la reunion';
+        $mail->sala = $sala->sa_nombre;
+        $mail->tema = $reunion->sare_tema;
+        $mail->fecha_inicio = $fecha_inicio->format('d \d\e F \d\e Y, H:i');;
+        $mail->fecha_fin = $fecha_fin->format('d \d\e F \d\e Y, H:i');;
+        $mail->contenido = $reunion->sare_descripcion;
+        $subject = 'Reunion Cancelada';
+        $usuarios = User::where('status', 'AC')->get();
+        // Mail::to('russell.tun@comsitec.com.mx')->send(new ReunionMailable($mail, $subject));
+        foreach ($usuarios as $user) {
+            $mail->usuario = $user->name;
+            Mail::to($user->email)->send(new ReunionMailable($mail, $subject));
+        }
         return response()->json([
             'mesagge' => 'La reunion se a elimnado con exito',
             'estatus' => 'OK'
