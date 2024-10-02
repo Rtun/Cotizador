@@ -150,6 +150,16 @@ class ProductosController extends Controller
                 $buscarProd = Cot_Producto::where('prod_cve_syscom', $context['cve_prod'])->first();
 
                 if(!$buscarProd) {
+                    $token = '43695a51107d9fabe57589a32c7498776c286be5954b5031b06989acf74c173c';
+                    $response = Http::withHeaders([
+                        'Bmx-Token' => $token,
+                    ])->get('https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/oportuno');
+
+                    $decodificacion = json_decode($response, true);
+                    $dolar = $decodificacion['bmx']['series'][0]['datos'][0]['dato'] + .60;
+                    $precio = $context['precio_prod'] * $dolar;
+
+
                     $producto = new Cot_Producto();
                     $producto->prod_cve_syscom = $context['cve_prod'];
                     $producto->prod_nombre = $context['nombre_prod'];
@@ -157,7 +167,7 @@ class ProductosController extends Controller
                     $producto->modelo = $context['modelo'];
                     $producto->idproveedor = $proveedor->idproveedor;
                     $producto->prod_medicion = $context['medicion_prod'];
-                    $producto->prod_precio_brut = $context['precio_prod'];
+                    $producto->prod_precio_brut = $precio;
                     $producto->prod_tipo = $context['tipo_prod'];
                     $producto->status = 'AC';
                     $producto->save();

@@ -29,7 +29,6 @@ class MailController extends Controller
         $rutaArchivo = storage_path().'/app/documentos/' . $cotizacion->documento.'.xlsx';
 
         $mail = new \stdClass();
-
         $mail->nombre_cliente = $cotizacion->cliente;
         $mail->usuario = $cotizacion->usuario;
         $mail->cotizacion_encabezado = $cotizacion->encabezado;
@@ -38,7 +37,7 @@ class MailController extends Controller
         $mail->cantidad = $cotizacion->cantidad;
         $nombreArchivo = 'Cotizacion_'.$idcotizacion.'_'.$cotizacion->cliente.'_'.time();
 
-        Mail::to('russell.tun@comsitec.com.mx')->send(new CotizacionMailable($mail, $rutaArchivo, $nombreArchivo));
+        Mail::to($cotizacion->email)->send(new CotizacionMailable($mail, $rutaArchivo, $nombreArchivo));
         return 'mensaje enviado';
     }
 }

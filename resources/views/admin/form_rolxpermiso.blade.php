@@ -4,8 +4,11 @@
 Permisos
 @endsection
 
-@section('content')
+@section('modulo')
+    Permisos
+@endsection
 
+@section('content')
 <div class="card" id="app">
     <div class="card-header">
       <h3 class="card-title">Permisos del Rol {{$rol->nombre}}</h3>

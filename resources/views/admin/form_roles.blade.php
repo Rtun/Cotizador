@@ -4,6 +4,9 @@
     Agregar roles
 @endsection
 
+@section('modulo')
+    Roles
+@endsection
 
 @section('content')
 <div class="card card-default" id="app">

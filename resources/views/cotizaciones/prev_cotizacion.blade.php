@@ -643,7 +643,9 @@
                 <div class="col-12 col-sm-6">
                     <div class="form-group">
                         <button type="button" class="btn btn-primary" @click="cotizar_sig">Siguiente</button>
-                        <button type="button" class="btn btn-success" @click="actualizarValor">actualizar valor</button>
+                        @if (validacion_rol(Auth()->user()->idrol, 'COTACTPRECIOS'))
+                            <button type="button" class="btn btn-success" @click="actualizarValor">actualizar valor</button>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -728,6 +730,7 @@
                 ,utilidad:<?php echo json_encode($utilidad);?>
                 ,adicional:<?php echo json_encode($adicional);?>
                 ,conceptos:<?php echo json_encode($conceptos);?>
+                ,permisos:<?php echo json_encode(session()->get('permisosUsuario'))?>
             },
             mounted() {
                 this.obtener_valor_dolar();
@@ -785,6 +788,7 @@
                 cotizar_sig: function() {
                     if( this.tipo_cambio != '' ) {
                         this.estadoform = true;
+                        console.log(this.permisos);
                     }
                     else {
                         Swal.fire({

@@ -4,8 +4,11 @@
 Roles
 @endsection
 
-@section('content')
+@section('modulo')
+    Roles
+@endsection
 
+@section('content')
 <div class="card" id="app">
     <div class="card-header">
       <h3 class="card-title">Roles</h3>

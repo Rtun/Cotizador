@@ -43,7 +43,7 @@
           <td>@{{elemento.modelo}}</td>
           <td>@{{elemento.proveedor}}</td>
           <td>@{{elemento.prod_medicion}}</td>
-          <td>@{{parseFloat(elemento.prod_precio_brut)}}</td>
+          <td>$@{{parseFloat(elemento.prod_precio_brut)}} MXN</td>
           <td>@{{elemento.prod_tipo}}</td>
         </tr>
         </tfoot>

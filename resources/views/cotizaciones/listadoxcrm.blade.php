@@ -53,7 +53,7 @@
         <tbody>
             <tr v-for="elemento in cotizaciones">
                 <td>@{{elemento.cliente}}</td>
-                <td v-if="usuario.idrol">@{{elemento.usuario}}</td>
+                <td v-if="usuario.idrol == 1">@{{elemento.usuario}}</td>
                 <td>@{{elemento.crm}}</td>
                 <td>@{{elemento.encabezado}}</td>
                 <td>@{{elemento.fecha_creacion}}</td>
@@ -63,8 +63,12 @@
                 <td>@{{elemento.conteo}}</td>
                 <td><button class="btn btn-success" @click="descargar_doc(elemento.documento)"><i class="fas fa-cloud-download-alt"></i></button></td>
                 <td>
+                    @if (validacion_rol(Auth()->user()->idrol, 'COTDETALLE'))
                     <button class="btn btn-primary" data-toggle="modal" data-target="#modal-detalles" @click="mostrar_detalle(elemento.idcotizacion)"><i class="fas fa-eye"></i></button>
+                    @endif
+                    @if (validacion_rol(Auth()->user()->idrol, 'COTEDITAR'))
                     <button id="editar" class="btn btn-warning" @click="copiarCot(elemento.idcotizacion)"><i class="fas fa-pencil-alt"></i></button>
+                    @endif
                 </td>
                 <td>
                     <button v-show="!enviando" class="btn btn-primary" id="enviar" @click="enviarCotizacion(elemento.idcotizacion)"><i class="fas fa-paper-plane"></i></button>

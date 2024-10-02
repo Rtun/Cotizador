@@ -4,8 +4,11 @@
 Usuarios
 @endsection
 
-@section('content')
+@section('modulo')
+    Usuarios
+@endsection
 
+@section('content')
 <div class="card" id="app">
     <div class="card-header">
       <h3 class="card-title">Usuarios</h3>
