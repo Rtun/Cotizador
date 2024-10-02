@@ -425,7 +425,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Adicionales</label>
-                                    <select ref="adicionalselect" name="cli_nombre" id="cli_nombre" class="form-control select2" data-index_add="0" style="width: 100%;">
+                                    <select ref="adicionalselect" name="cli_nombre" id="cli_nombre" class="form-control" data-index_add="0" style="width: 100%;">
                                         <option value="" selected disabled>Selecciona un adicional</option>
                                         <option v-for="adicionales in adicional"
                                         :data-cotad_precio="adicionales.cotad_precio"
@@ -730,7 +730,6 @@
                 ,utilidad:<?php echo json_encode($utilidad);?>
                 ,adicional:<?php echo json_encode($adicional);?>
                 ,conceptos:<?php echo json_encode($conceptos);?>
-                ,permisos:<?php echo json_encode(session()->get('permisosUsuario'))?>
             },
             mounted() {
                 this.obtener_valor_dolar();
@@ -746,19 +745,15 @@
                 });
 
                 $('#modal-productos').on('shown.bs.modal', function () {
-                    //inicializa el select2 de productos, de esta forma xq esta dentro de un modal
+                    // Inicializa el select2 cuando el modal se muestre
                     $('.select2').select2({
                         dropdownParent: $('#modal-productos')
                     });
                 });
 
-                // destruye y vuelve a inicializar select2 para evitar conflictos
                 $('#modal-productos').on('hidden.bs.modal', function () {
-                    $('.select2').each(function () {
-                        if($(this).hasClass('select2-hidden-accessible')) {
-                            $(this).select2('destroy')
-                        }
-                    });
+                    // Destruye select2 cuando el modal se oculta
+                    $('.select2').select2('destroy');
                 });
 
                 // Maneja el evento 'change' de select2
@@ -788,7 +783,6 @@
                 cotizar_sig: function() {
                     if( this.tipo_cambio != '' ) {
                         this.estadoform = true;
-                        console.log(this.permisos);
                     }
                     else {
                         Swal.fire({
@@ -1190,7 +1184,6 @@
                             });
                     }
                 },
-
             }
         });
     </script>

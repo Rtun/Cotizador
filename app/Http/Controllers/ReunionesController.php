@@ -217,8 +217,8 @@ class ReunionesController extends Controller
             $mail->mensaje = 'hay una nueva reunion agendada';
             $mail->sala = $sala->sa_nombre;
             $mail->tema = $reuniones->sare_tema;
-            $mail->fecha_inicio = $fecha_inicio->format('d \d\e F \d\e Y, H:i');;
-            $mail->fecha_fin = $fecha_fin->format('d \d\e F \d\e Y, H:i');;
+            $mail->fecha_inicio = $fecha_inicio->format('d \d\e F \d\e Y, H:i');
+            $mail->fecha_fin = $fecha_fin->format('d \d\e F \d\e Y, H:i');
             $mail->contenido = $reuniones->sare_descripcion;
             $subject = 'Reunion Agendada';
             // Mail::to('russelltun.ek@gmail.com')->send(new ReunionMailable($mail, $subject));

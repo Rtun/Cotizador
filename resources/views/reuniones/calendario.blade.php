@@ -47,8 +47,6 @@ Calendario
                 <label class="custom-control-label" for="customSwitch1">Por archivo ics</label>
               </div>
 
-              <!-- /btn-group -->
-
               <form @submit.prevent="addEvento" v-if="porArchivo">
                 <label for="sala">Sala:</label>
                 <select @change="selecionaSala($event)" class="custom-select" id="sala" required>
@@ -155,6 +153,7 @@ Calendario
 @section('java_extensions')
 <!-- fullCalendar 2.2.5 -->
 <script src="{{asset('plugins/moment/moment.min.js')}}"></script>
+<script src="{{asset('plugins/moment/locales.min.js')}}"></script>
 <script src="{{asset('plugins/fullcalendar/main.js')}}"></script>
 <script src="{{asset('plugins/fullcalendar/locales/es.js')}}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.4.0/ical.min.js"></script>
@@ -407,13 +406,16 @@ Calendario
                 this.loadICSFile(file);
             },
             mostrarModal(event) {
+                moment.locale('es');  // Configura Moment.js en español
                 // Llenar los datos del evento en la variable modalEvent
+                var formattedStart = moment(event.start).format('DD [de] MMMM [de] YYYY, H:mm A');
+                var formattedEnd = moment(event.end).format('DD [de] MMMM [de] YYYY, H:mm A');
                 this.modalEvent = {
                     idusuario: event.extendedProps.idusuario,
                     idevento: event.extendedProps.idevento,
                     title: event.title,
-                    start: event.start.toISOString(),  // Formato de la fecha para mostrar
-                    end: event.end ? event.end.toISOString() : 'Sin fecha de fin',
+                    start: formattedStart,  // Formato de la fecha para mostrar
+                    end: formattedEnd,
                     user:event.extendedProps.usuario,
                     sala:event.extendedProps.Nombresala,
                     description: event.extendedProps.description || 'Sin descripción'

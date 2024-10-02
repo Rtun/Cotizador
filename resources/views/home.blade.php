@@ -130,7 +130,7 @@ Inicio
 
             <div class="modal-footer justify-content-between">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar Alerta</button>
-              <button type="button" class="btn btn-primary" @click="cerrarSeleccionados">Rechazar</button>
+              <button v-show="pendientes.length > 0" type="button" class="btn btn-primary" @click="cerrarSeleccionados">Rechazar</button>
             </div>
           </div>
           <!-- /.modal-content -->

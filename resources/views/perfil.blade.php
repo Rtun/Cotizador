@@ -48,39 +48,35 @@
           <!-- About Me Box -->
           <div class="card card-primary">
             <div class="card-header">
-              <h3 class="card-title">About Me</h3>
+              <h3 class="card-title">Sobre Mi</h3>
             </div>
             <!-- /.card-header -->
             <div class="card-body">
-              <strong><i class="fas fa-book mr-1"></i> Education</strong>
+              <strong><i class="fas fa-book mr-1"></i> Educación</strong>
 
               <p class="text-muted">
-                B.S. in Computer Science from the University of Tennessee at Knoxville
+                Proximamente modificable
               </p>
 
               <hr>
 
-              <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
+              <strong><i class="fas fa-map-marker-alt mr-1"></i> Ubicación</strong>
 
-              <p class="text-muted">Malibu, California</p>
+              <p class="text-muted">Proximamente modificable</p>
 
               <hr>
 
-              <strong><i class="fas fa-pencil-alt mr-1"></i> Skills</strong>
+              <strong><i class="fas fa-pencil-alt mr-1"></i> Habilidades</strong>
 
               <p class="text-muted">
-                <span class="tag tag-danger">UI Design</span>
-                <span class="tag tag-success">Coding</span>
-                <span class="tag tag-info">Javascript</span>
-                <span class="tag tag-warning">PHP</span>
-                <span class="tag tag-primary">Node.js</span>
+                <span class="tag tag-danger">Proximamnete modificable</span>
               </p>
 
               <hr>
 
-              <strong><i class="far fa-file-alt mr-1"></i> Notes</strong>
+              <strong><i class="far fa-file-alt mr-1"></i> Notas</strong>
 
-              <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam fermentum enim neque.</p>
+              <p class="text-muted">Proximamente modificable</p>
             </div>
             <!-- /.card-body -->
           </div>
@@ -185,7 +181,7 @@
                     <div class="form-group row">
                       <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
                       <div class="col-sm-10">
-                        <input type="email" class="form-control" id="inputEmail" name="email" value="{{$usuario->email}}">
+                        <input type="email" class="form-control" id="inputEmail" name="email" value="{{$usuario->email}}" disabled>
                       </div>
                     </div>
                     <div class="form-group row">

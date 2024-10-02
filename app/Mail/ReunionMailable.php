@@ -46,7 +46,7 @@ class ReunionMailable extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.cotizaciones',
+            view: 'emails.reuniones',
             with: ['context' => $this->datosReunion]
         );
     }

@@ -376,7 +376,7 @@
                         });
                         swalWithBootstrapButtons.fire({
                             title: "Estas Seguro?",
-                            text: "Al finalizar una cotizacion en automatico se cerraran las demas",
+                            text: "Al finalizar una cotizacion señalas que esta fue ganada y en automatico se cerraran las demas ligadas a este crm.",
                             icon: "warning",
                             showCancelButton: true,
                             confirmButtonText: "Si, Cerrar!",
@@ -512,7 +512,7 @@
                     });
                     swalWithBootstrapButtons.fire({
                         title: "Estas seguro?",
-                        text: "Quieres enviar este documento al cliente?, si hiciste modificaciones al documento. se recomienda redactar y enviar el correo de forma manual al cliente.",
+                        text: "Quieres enviar este documento al cliente?, si hiciste modificaciones al documento. se recomienda redactar y enviar el correo de forma manual.",
                         icon: "warning",
                         showCancelButton: true,
                         confirmButtonText: "Si, enviar!",
@@ -520,25 +520,30 @@
                         reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            this.enviando = true;
-                            let url = this.url_enviar + '/' + id;
+                            // this.enviando = true;
+                            // let url = this.url_enviar + '/' + id;
 
-                            axios.post(url).then(response => {
-                                Swal.fire({
-                                    title: 'Hecho',
-                                    text:'La cotizacion a sido enviada al cliente via correo',
-                                    icon: 'success'
-                                }).then(result => {
-                                    this.enviando = false;
-                                });
-                            }).catch(error => {
-                                console.log('Este es el error que brinda el servidor => ' + error);
-                                Swal.fire({
-                                    title:'Error',
-                                    text: 'Ha ocurrido un error al enviar el correo, por favor contactame',
-                                    icon: 'error'
-                                });
-                            });
+                            // axios.post(url).then(response => {
+                            //     Swal.fire({
+                            //         title: 'Hecho',
+                            //         text:'La cotizacion a sido enviada al cliente via correo',
+                            //         icon: 'success'
+                            //     }).then(result => {
+                            //         this.enviando = false;
+                            //     });
+                            // }).catch(error => {
+                            //     console.log('Este es el error que brinda el servidor => ' + error);
+                            //     Swal.fire({
+                            //         title:'Error',
+                            //         text: 'Ha ocurrido un error al enviar el correo, por favor contactame',
+                            //         icon: 'error'
+                            //     });
+                            // });
+                            Swal.fire({
+                                title: 'Espera!!!',
+                                text: 'La opcion de enviar la cotizacion al cliente aun esta en face inicial (pruebas)',
+                                icon:'warning'
+                            })
                         }
                     });
                 }
