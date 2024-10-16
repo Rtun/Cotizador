@@ -1,56 +1,58 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Access Denied</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<style>
-    body{
-        background-color: black;
-        color: white;
-    }
+@extends('layouts.app')
 
-    h1 {
-        color: red;
-    }
+@section('modulo')
+    Acceso denegado
+@endsection
 
-    h6{
-        color: red;
-        text-decoration: underline;
-    }
+@section('content')
+    <style>
+        /* .container {
+            border-style: dashed;
+            border-color: black;
+        } */
 
-    .w3-button-custom {
-        background-color: red; /* Cambia el color del botón */
-        color: white;
-        padding: 15px 32px;
-        font-size: 16px;
-    }
+        h1 {
+            color: red;
+        }
 
-    .w3-button-custom:hover {
-        background-color: darkred; /* Color al pasar el mouse */
-    }
-</style>
-</head>
-<body>
-    <div class="w3-display-middle">
-        <h1 class="w3-jumbo w3-animate-top w3-center"><code>Acceso Denegado</code></h1>
-        <hr class="w3-border-white w3-animate-left" style="margin:auto;width:50%">
-        <h3 class="w3-center w3-animate-right">{{ $mensaje }}</h3>
-        <h3 class="w3-center w3-animate-zoom">🚫🚫🚫🚫</h3>
-        <br><br>
-        @if ($estatus == '403Baja')
-            <div class="w3-center">
-                <a href="{{ route('login.destroy') }}" class="w3-button w3-button-custom w3-round-large">Click Para Regresar</a>
+        h6 {
+            color: red;
+            text-decoration: underline;
+        }
+
+        h3 {
+            color: black;
+
+        }
+
+        .btn-danger-custom {
+            background-color: red;
+            color: white;
+            padding: 15px 32px;
+            font-size: 16px;
+        }
+
+        .btn-danger-custom:hover {
+            background-color: darkred;
+        }
+    </style>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h1 class="display-3 text-danger">Acceso Denegado</h1>
+                <hr class="border-black" style="width:50%">
+                <h3>{{ $mensaje }}</h3>
+                <h3>🚫🚫🚫🚫</h3>
+                <br><br>
+                @if ($estatus == '403Baja')
+                    <a href="{{ route('login.destroy') }}" class="btn btn-danger-custom btn-lg">Click Para Regresar</a>
+                @else
+                    <a href="{{ url()->previous() }}" class="btn btn-danger-custom btn-lg">Click Para Salir</a>
+                @endif
+                <br><br>
+                <h6 class="text-danger text-decoration-underline">error code: 403 forbidden</h6>
             </div>
-        @else
-            <div class="w3-center">
-                <a href="{{ url()->previous() }}"class="w3-button w3-button-custom w3-round-large">Click Para Regresar</a>
-            </div>
-        @endif
-        <br><br>
-        <h6 class="w3-center w3-animate-zoom">error code: 403 forbidden</h6>
+        </div>
     </div>
-</body>
-</html>
+@endsection

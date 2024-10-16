@@ -162,6 +162,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     }
                 });
             });
+
+            document.getElementById('perfil-button').addEventListener('click', function(e) {
+                window.location.href = '{{ route('perfil') }}';
+            });
         },
     });
 </script>

@@ -50,7 +50,7 @@ class Candado
         }
 
         // Si no tiene permiso, retornar una vista personalizada de 403
-        $mensaje = 'Lo sentimos, No tienes Permisos Para Acceder A Esta Ubicacion.';
+        $mensaje = 'Lo sentimos, No tienes Permisos Para Acceder al modulo '.$permiso;
         $estatus = '403 Sin Permiso';
         return response()->view('403Permisos', compact('mensaje', 'estatus'));
     }

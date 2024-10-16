@@ -20,9 +20,10 @@
           <i class="fas fa-search"></i>
         </a>
         <div class="navbar-search-block">
-          <form class="form-inline">
+          <form class="form-inline" action="{{route('buscadorGeneral')}}">
+            {{ csrf_field() }}
             <div class="input-group input-group-sm">
-              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+              <input class="form-control form-control-navbar" name="criterio" type="search" placeholder="Search" aria-label="Search">
               <div class="input-group-append">
                 <button class="btn btn-navbar" type="submit">
                   <i class="fas fa-search"></i>
@@ -51,8 +52,7 @@
                   <i class="fas fa-user"></i>
               </button>
               <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
-                <button class="dropdown-item" type="button">Action</button>
-                <button class="dropdown-item" type="button">Another action</button>
+                <a class="dropdown-item" id="perfil-button" role="button"><i class="fas fa-cog"></i> Configuracion</button>
                 <a class="dropdown-item" id="logout-boton" role="button"><i class="fas fa-sign-out-alt"> Cerrar Sesion</i></a>
               </div>
             </div>

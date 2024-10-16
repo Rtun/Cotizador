@@ -140,9 +140,7 @@ class LoginController extends Controller
         if (!$esAdmin) {
             $queryPendientes->where('cot_encabezado.idusuario', usuario()->id);
         }
-
         $pendientes = $queryPendientes->get()->toArray();
-
 
         $queryActividad = DB::table('cot_encabezado')
         ->join('cot_clientes', 'cot_clientes.idclientes', '=', 'cot_encabezado.idcliente')
@@ -164,11 +162,17 @@ class LoginController extends Controller
         if (!$esAdmin) {
             $queryActividad->where('cot_encabezado.idusuario', usuario()->id);
         }
-
         $actividad = $queryActividad->orderBy('cot_fecha_modificacion','desc')->get()->toArray();
+
+        $queryGanandas = Cot_Encabezado::where('cot_fecha_cierre', '!=', null);
+        if (!$esAdmin) {
+            $queryGanandas->where('cot_encabezado.idusuario', usuario()->id);
+        }
+        $ganadas = $queryGanandas->count();
         $informacion = [
             'usuario' => $usuario,
             'cotizaciones' => $cotizaciones,
+            'ganadas' => $ganadas,
             'pendientes' => $pendientes,
             'actividad' => $actividad
         ];

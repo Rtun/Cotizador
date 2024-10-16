@@ -97,7 +97,7 @@
                     <!-- /.col -->
                     <div class="col-md-2">
                         <div class="form-group">
-                            <input v-show="!reg_nuevo_user" class="form-check-input" v-model="reg_nuevo_user" type="checkbox" name="nuevo_usuario" id="nuevo_usuario">
+                            <input class="form-check-input" v-model="reg_nuevo_user" type="checkbox" name="nuevo_usuario" id="nuevo_usuario">
                             <label v-show="!reg_nuevo_user" for="nuevo_usuario" class="form-check-label">El cliente es nuevo? </label>
                             <button v-show="reg_nuevo_user" type="button" class="btn btn-block btn-outline-success btn-sm" @click="registrarNuevo">Registrar Nuevo</button>
                         </div>
@@ -224,7 +224,7 @@
                             </div>
                             <div class="modal-body">
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-9">
                                         <div class="form-group">
                                             <label>Producto:</label>
                                             <select ref="productoSelect" class="form-control select2 select2bs4 producto-select" style="width: 100%;" name="productos" data-index="0" id="producto-select">
@@ -242,6 +242,15 @@
                                                 </option>
                                             </select>
                                         </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="form-group" v-show="!refresh">
+                                            <button @click="refresh_list" class="btn btn-success justify-content-md-center" name="actualizar"><i class="fas fa-sync"></i></button>
+                                        </div>
+                                        <button class="btn btn-success" type="button" v-show="refresh" disabled>
+                                            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                        </button>
                                     </div>
 
                                     <div class="col-md-6">
@@ -321,7 +330,7 @@
                                         <!-- /.form-group -->
                                         <div class="form-group">
                                             <label>Utilidad</label>
-                                            <input type="text" class="form-control" id="utilidad" placeholder="Utilidad" v-model="currentProducto.utilidad">
+                                            <input type="text" class="form-control" id="utilidad" placeholder="Utilidad" v-model="currentProducto.utilidad" name="utilidad">
                                         </div>
                                         <!-- /.form-group -->
                                     </div>
@@ -329,7 +338,7 @@
                                         <!-- /.form-group -->
                                         <div class="form-group">
                                             <label>Precio Total</label>
-                                            <input readonly type="text" class="form-control" id="precioTotal" placeholder="precioTotal" v-model="currentProducto.precioTotal">
+                                            <input readonly type="text" class="form-control" id="precioTotal" placeholder="precioTotal" v-model="currentProducto.precioTotal" name="PrecioTotal">
                                         </div>
                                         <!-- /.form-group -->
                                     </div>
@@ -388,7 +397,7 @@
                                     <!-- /.form-group -->
                                     <div class="form-group">
                                         <label>Utilidad</label>
-                                        <input type="number" class="form-control" id="utilidad" placeholder="Utilidad" v-model="servicios.utilidad">
+                                        <input type="number" class="form-control" id="Servutilidad" placeholder="Utilidad" v-model="servicios.utilidad" name="ServUtilidad">
                                     </div>
                                     <!-- /.form-group -->
                                 </div>
@@ -634,7 +643,7 @@
                         <label>Coloca el tipo de cambio</label>
                         <input type="numeric" class="form-control"  v-model="tipo_cambio"  id="tipo_cambio" placeholder="Valor del dolar">
                         <br>
-                        <p>*El valor del dolar es el obtenido del banco de mexico + 0.60 centavos*</p>
+                        <p>*El valor del dolar es el obtenido del banco de mexico @{{valorDolar}} + el 5% @{{valorPorcentaje}}</p>
                         <p>*En caso de requerir decimales, colocalos en el formato 20.95*</p>
                         <p>*No colocar el simbolo "$"*</p>
                         <p>*EL boton actualizar valor, actualiza el valor del dolar*</p>
@@ -667,8 +676,11 @@
                 estadoform: false,
                 reg_nuevo_user: false,
                 cotizando: false,
+                refresh:false,
                 crm: '',
                 tipo_cambio:'',
+                valorDolar: 0,
+                valorPorcenaje: 0,
                 productosList: [],
                 serviciosList: [],
                 adicionalesList:[],
@@ -766,13 +778,12 @@
                 obtener_valor_dolar() {
                     axios.get('/api/dolar/obtener')
                     .then(response => {
-                        // El valor de la serie contiene la tasa de cambio del dólar.
-                        const valorDolar = response.data.valorDolar;
-                        console.log(`El valor del dólar es: ${valorDolar}`);
-                        this.tipo_cambio = valorDolar;
+                        this.tipo_cambio = response.data.dolar;
+                        this.valorDolar = response.data.dolar_api;
+                        this.valorPorcentaje = response.data.porcentaje;
                     })
                     .catch(error => {
-                        console.error('Error al obtener el valor del dólar:', error);
+                        console.error('Error al obtener el valor del dólar: ', error);
                         Swal.fire({
                             title:'Error al obtener el valor del dolar',
                             text: 'Hubo un error al obtener el tipo de cambio, se tendra que ingresar manual. porfavor notificame de este error',
@@ -780,7 +791,7 @@
                         });
                     });
                 },
-                cotizar_sig: function() {
+                cotizar_sig() {
                     if( this.tipo_cambio != '' ) {
                         this.estadoform = true;
                     }
@@ -797,11 +808,16 @@
                     .then(response => {
                         // El valor de la serie contiene la tasa de cambio del dólar.
                         const valorDolar = parseFloat(response.data.bmx.series[0].datos[0].dato);
-                        this.tipo_cambio = valorDolar + .60;
+                        var porcentaje = (5/100) * valorDolar;
+                        this.tipo_cambio = (porcentaje + valorDolar).toFixed(2);
+                        this.valorDolar = valorDolar;
+                        this.ValorPorcenaje = porcentaje;
 
                         if(valorDolar > 0) {
                             datos = {
-                                tipo_cambio: this.tipo_cambio
+                                tipo_cambio: this.tipo_cambio,
+                                valorDolar: this.valorDolar,
+                                porcentaje: this.ValorPorcenaje
                             };
                             axios.post('/api/dolar/save', datos).then(response => {
                                 console.log('nuevo valor => ' + response.data.valor);
@@ -983,7 +999,6 @@
                                text: response.data.mensaje,
                                icon: 'success'
                             }).then(result => {
-                                this.reg_nuevo_user = false;
                                 this.idcliente = response.data.idcliente;
                             });
                         }).catch(error => {
@@ -995,6 +1010,21 @@
                             });
                         });
                     }
+                },
+                refresh_list() {
+                    this.refresh = true;
+                    this.productos = [];
+                    axios.get('/cotizacion/refresh-prods').then(response => {
+                        this.productos.push(...response.data);
+                        this.refresh = false;
+                    }).catch(error => {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Hubo un error al traer los productos',
+                            icon: 'error'
+                        });
+                    });
+                    console.log('Actualizamos los productos' + this.productos);
                 },
                 // Servicios
                 addServicio() {

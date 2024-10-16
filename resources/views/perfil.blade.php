@@ -32,10 +32,10 @@
                   <b>Cotizaciones</b> <a class="float-right">{{$cotizaciones}}</a>
                 </li>
                 <li class="list-group-item">
-                  <b>Following</b> <a class="float-right">543</a>
+                  <b>Ganadas</b> <a class="float-right">{{$ganadas}}</a>
                 </li>
                 <li class="list-group-item">
-                  <b>Friends</b> <a class="float-right">13,287</a>
+                  <b>Pendientes</b> <a class="float-right">{{count($pendientes)}}</a>
                 </li>
               </ul>
 
@@ -303,7 +303,6 @@
             },
             methods: {
                 terminos() {
-                    console.log('Diste un clic');
                     $('#modal-terminos').modal('show');
                 }
             },

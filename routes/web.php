@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdicionalesController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BuscadorController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CotizacionController;
 use App\Http\Controllers\GlobalController;
@@ -32,6 +33,10 @@ Route::get('/pruebas',[PruebaController::class, 'index'])->name('prueba');
 Route::get('/', [LoginController::class, 'inicio'])->name('inicio');
 Route::get('/perfil/usuario', [LoginController::class, 'perfilData'])->name('perfil');
 Route::post('/perfil/actualizar/datos', [RegisterController::class, 'actualizar_datos'])->name('perfil.actualizar');
+
+//Buscador
+Route::get('/buscador', [BuscadorController::class, 'buscador'])->middleware('candado:BUSCADOR')->name('buscadorGeneral');
+
 //Cotizaciones
 Route::get('/cotizacion/listado', [CotizacionController::class, 'listado_cotizaciones'])->middleware('candado:COTIZACIONES')->name('cotizacion.listado');
 Route::get('/cotizacion/listado/{crm}', [CotizacionController::class, 'cotizacion_x_crm'])->middleware('candado:COTIZACRM')->name('cotizacion.listado_crm');
@@ -43,6 +48,7 @@ Route::post('/cotizacion/finalizar', [CotizacionController::class, 'cerrar_cotiz
 Route::post('/cotizacion/actualizar/precios', [CotizacionController::class, 'actualizar_precios'])->middleware('candado:COTACTPRECIOS');
 Route::get('/cotizacion/obtener_clientes', [CotizacionController::class, 'getClientes']);
 Route::post('/cotizacion/rechazar', [CotizacionController::class, 'rechazar_cotizaciones']);
+Route::get('/cotizacion/refresh-prods', [CotizacionController::class, 'refresh_prods'])->name('cotizacion.refresh');
 Route::get('/cotizacion/prueba', [CotizacionController::class, 'prueba']);
 
 // catalogos clientes

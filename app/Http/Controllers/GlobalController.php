@@ -11,7 +11,9 @@ class GlobalController extends Controller
         $dolar = Tipo_Cambio::all()->first();
 
         return response()->json([
-            'valorDolar' => $dolar->valor,
+            'dolar' => $dolar->valor,
+            'porcentaje' => $dolar->porcentaje,
+            'dolar_api' => $dolar->valor_api,
             'estatus' => 'OK'
         ],202);
     }
@@ -20,8 +22,20 @@ class GlobalController extends Controller
         $context = $r->all();
 
         $dolar = Tipo_Cambio::all()->first();
-        $dolar->valor = $context['tipo_cambio'];
-        $dolar->save();
+
+        if($dolar) {
+            $dolar->valor = $context['tipo_cambio'];
+            $dolar->porcentaje = $context['porcentaje'];
+            $dolar->valor_api = $context['valorDolar'];
+            $dolar->save();
+        }
+        else {
+            $dolar = new Tipo_Cambio();
+            $dolar->valor = $context['tipo_cambio'];
+            $dolar->porcentaje = $context['porcentaje'];
+            $dolar->valor_api = $context['valorDolar'];
+            $dolar->save();
+        }
         $parametros = [
             'tabla' => 'tipo_cambio',
             'objeto_modificado' => $dolar->idtipocambio,

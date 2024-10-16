@@ -875,4 +875,23 @@ class CotizacionController extends Controller
             ]);
         }
 
+        public function refresh_prods() {
+            $cons_prod_mysql = DB::table('cot_productos')
+                                ->join('prod_marca', 'prod_marca.idmarca', '=', 'cot_productos.idmarca') // Cambiado idmarca
+                                ->join('prod_proveedor', 'prod_proveedor.idproveedor', '=', 'cot_productos.idproveedor')
+                                ->select(
+                                    "cot_productos.idproductos", // Asegúrate de que este es el campo correcto de la tabla cot_productos
+                                    "cot_productos.prod_cve as cve_producto",
+                                    "cot_productos.prod_nombre as nombre",
+                                    "cot_productos.prod_medicion as unit_med",
+                                    "cot_productos.prod_precio_brut as costo_unidad",
+                                    "prod_marca.m_nombre as marca",
+                                    "cot_productos.modelo as modelo",
+                                    "prod_proveedor.prv_nombre as proveedor"
+                                )
+                                ->where('cot_productos.status', 'AC')
+                                ->get()->toArray();
+            return response()->json($cons_prod_mysql);
+        }
+
 }
