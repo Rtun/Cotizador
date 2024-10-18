@@ -88,9 +88,50 @@ class GlobalController extends Controller
 
         $fecha = hoy();
         foreach( $consulta_sqlserver as $prod) {
+            $findmarca = Marca::where('m_nombre', $prod->marca)->first();
+            if($findmarca) {
+                $marca = $findmarca->idmarca;
+            }
+            else {
+                $newmarca = new Marca();
+                $newmarca->m_nombre = $prod->marca;
+                $newmarca->save();
+                $marca = $newmarca->idmarca;
+            }
             $findproveedor = Proveedor::where('prv_nombre', $prod->proveedor)->first();
-            $findproveedor->prv_estado = $prod->estado;
-            $findproveedor->save();
+            if($findproveedor) {
+                $proveedor = $findproveedor->idproveedor;
+            }
+            else {
+                $newproveedor = new Proveedor();
+                $newproveedor->prv_nombre = $prod->proveedor;
+                $newproveedor->idusuario = $usuario;
+                $newproveedor->prv_fecha_creacion = $fecha;
+                $newproveedor->prv_rfc = $prod->rfc;
+                $newproveedor->prv_razon_social = $prod->razon;
+                $newproveedor->prv_direccion = $prod->direccion.' '.$prod->calle;
+                $newproveedor->prv_telefono = $prod->telefono;
+                $newproveedor->prv_ciudad = $prod->ciudad;
+                $newproveedor->prv_estado = $prod->estado;
+                $newproveedor->prv_pais = $prod->pais;
+                $newproveedor->prv_contacto = $prod->contacto;
+                $newproveedor->prv_email = $prod->mail;
+                $newproveedor->save();
+                $proveedor = $newproveedor->idproveedor;
+            }
+            $findprod = Cot_Producto::where('prod_cve', $prod->clave)->first();
+            if(!$findprod && is_int($prod->clave)) {
+                $producto = new Cot_Producto();
+                $producto->prod_cve = $prod->clave;
+                $producto->prod_nombre = $prod->nombre;
+                $producto->idmarca = $marca;
+                $producto->modelo = $prod->modelo;
+                $producto->idproveedor = $proveedor;
+                $producto->prod_medicion = $prod->unidad;
+                $producto->prod_precio_brut = $prod->precio;
+                $producto->prod_tipo = 'PRODUCTO';
+                $producto->save();
+            }
         }
 
         dd($consulta_sqlserver);
