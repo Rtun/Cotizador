@@ -432,19 +432,22 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Adicionales</label>
-                                    <select ref="adicionalselect" name="cli_nombre" id="cli_nombre" class="form-control" data-index_add="0" style="width: 100%;">
-                                        <option value="" selected disabled>Selecciona un adicional</option>
-                                        <option v-for="adicionales in adicional"
-                                        :data-cotad_precio="adicionales.cotad_precio"
-                                        :data-idcotadicionales="adicionales.idcotadicionales"
-                                        :data-cotad_nombre="adicionales.cotad_nombre"
-                                        :key="adicionales.idcotadicionales"
-                                        :value="adicionales.idcotadicionales">
-                                        @{{ adicionales.cotad_nombre }}
-                                        </option>
-                                    </select>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Adicionales</label>
+                                        <button @click="refresh_ad" class="btn btn-success justify-content-md-center" name="actualizarAdicional"><i class="fas fa-sync"></i></button>
+                                        <select ref="adicionalselect" name="cli_nombre" id="cli_nombre" class="form-control" data-index_add="0" style="width: 100%;">
+                                            <option value="" selected disabled>Selecciona un adicional</option>
+                                            <option v-for="adicionales in adicional"
+                                            :data-cotad_precio="adicionales.cotad_precio"
+                                            :data-idcotadicionales="adicionales.idcotadicionales"
+                                            :data-cotad_nombre="adicionales.cotad_nombre"
+                                            :key="adicionales.idcotadicionales"
+                                            :value="adicionales.idcotadicionales">
+                                            @{{ adicionales.cotad_nombre }}
+                                            </option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
@@ -1134,6 +1137,9 @@
                 },
                 removeAdicional(index_add) {
                     this.adicionalesList.splice(index_add, 1);
+                },
+                refresh_ad() {
+                    console.log('Clic');
                 },
                 // Formulario
                 enviarForm(event){

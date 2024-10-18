@@ -9,14 +9,7 @@ use Illuminate\Support\Facades\DB;
 class MarcaController extends Controller
 {
     public function show_marcas() {
-        $marcas = Marca::join('users', 'users.id', '=', 'prod_marca.idusuario')
-        ->select(
-            "idmarca",
-            "m_nombre",
-            "users.name as usuario",
-            DB::Raw("DATE_FORMAT(m_fecha_creacion,'%d-%m-%Y') as fecha_creacion")
-        )
-        ->where('m_status', 'AC')->get()->toArray();
+        $marcas = Marca::where('m_status', 'AC')->get()->toArray();
 
         $informacion = [
             'marcas' => $marcas
@@ -65,15 +58,12 @@ class MarcaController extends Controller
             case 'Agregar':
                 $marca = new Marca();
                 $marca->m_nombre = $context['nombre'];
-                $marca->idusuario = usuario()->id;
-                $marca->m_fecha_creacion = hoy();
                 $marca->save();
                 $mensaje = 'OK';
                 break;
             case 'Editar':
                 $marca = Marca::find($context['idmarca']);
                 $marca->m_nombre = $context['nombre'];
-                $marca->m_fecha_creacion = hoy();
                 $marca->save();
                 $mensaje = 'OK';
                 break;

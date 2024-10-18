@@ -26,16 +26,12 @@
         <tr>
           <th>Clave</th>
           <th>Nombre</th>
-          <th>Usuario Alta</th>
-          <th>Fecha de creación</th>
         </tr>
         </thead>
         <tbody>
         <tr v-for="elemento in marcas">
           <td><a :href="url_editar+'?idmarca='+elemento.idmarca">@{{elemento.idmarca}}</a></td>
           <td>@{{elemento.m_nombre}}</td>
-          <td>@{{elemento.usuario}}</td>
-          <td>@{{elemento.fecha_creacion}}</td>
         </tr>
         </tfoot>
       </table>
