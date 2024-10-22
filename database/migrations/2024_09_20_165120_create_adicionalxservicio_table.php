@@ -25,7 +25,7 @@ return new class extends Migration
             // Llaves foráneas
             $table->foreign('idadicional')->references('idcotadicionales')->on('cot_adicionales');
             $table->foreign('idcotizacion')->references('idcotizacion')->on('cot_encabezado');
-            $table->foreign('id_cot_detalle')->references('id_cot_detalle')->on('cot_detalle');
+            $table->foreign('id_cot_detalle')->references('idcot_detalle')->on('cot_detalle');
 
             // Índices
             $table->index('idcotizacion', 'cotizacion_idx');

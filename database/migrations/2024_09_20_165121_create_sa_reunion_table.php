@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::connection('mysql')->create('sa_reunion', function (Blueprint $table) {
             $table->id('idreunion');
-            $table->foreignId('idsala')->constrained('salas')->onDelete('cascade');
-            $table->foreignId('idusuario')->constrained('users')->onDelete('cascade');
+            $table->unsignedBigInteger('idsala');
+            $table->unsignedBigInteger('idusuario');
             $table->string('sare_tema', 50);
             $table->text('sare_descripcion')->nullable();
             $table->dateTime('sare_fecha_inicio');
@@ -23,6 +23,9 @@ return new class extends Migration
             $table->string('sare_color_borde', 20);
             $table->string('sare_color_texto', 20);
             $table->string('sare_status', 3)->default('AC');
+
+            $table->foreign('idsala')->references('idsala')->on('salas');
+            $table->foreign('idusuario')->references('id')->on('users');
 
             $table->index('idusuario');
             $table->index('idsala');

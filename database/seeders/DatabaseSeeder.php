@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
             ApiTokensSeeder::class,
             PermisosSeeder::class,
             RolSeeder::class,
-            RolxPermisoSeeder::class
+            RolxPermisoSeeder::class,
+            UserSeeder::class
         ]);
     }
 }
