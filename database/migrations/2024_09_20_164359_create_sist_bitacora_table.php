@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('idbitacora');
             $table->string('tabla_modificada', 150);
             $table->integer('objeto_modificado');
-            $table->unsignedBigInteger('idusuario'); // Asegúrate de que el tipo de datos coincida con la tabla de usuarios
+            $table->integer('idusuario'); // Asegúrate de que el tipo de datos coincida con la tabla de usuarios
             $table->dateTime('fecha');
             $table->string('accion', 45);
         });

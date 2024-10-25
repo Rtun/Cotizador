@@ -25,7 +25,7 @@ return new class extends Migration
             $table->text('cotdet_descripcion')->nullable();  // descripción como texto largo, nullable
             $table->decimal('cotdet_subtotal', 10, 5);  // subtotal con hasta 5 decimales
             $table->string('cotdet_moneda', 5);  // moneda varchar(5)
-            $table->unsignedBigInteger('cotdet_iva');  // clave foránea para el IVA
+            $table->integer('cotdet_iva');  // clave foránea para el IVA
             $table->string('cotdet_status', 3)->default('AC');  // estado con valor por defecto 'AC'
 
             // Relaciones

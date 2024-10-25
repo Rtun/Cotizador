@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cot_Clientes;
 use App\Models\Cot_Producto;
 use App\Models\Marca;
 use App\Models\Proveedor;
@@ -120,7 +121,7 @@ class GlobalController extends Controller
                 $proveedor = $newproveedor->idproveedor;
             }
             $findprod = Cot_Producto::where('prod_cve', $prod->clave)->first();
-            if(!$findprod && is_int($prod->clave)) {
+            if(!$findprod && is_numeric($prod->clave)) {
                 $producto = new Cot_Producto();
                 $producto->prod_cve = $prod->clave;
                 $producto->prod_nombre = $prod->nombre;
@@ -135,5 +136,47 @@ class GlobalController extends Controller
         }
 
         dd($consulta_sqlserver);
+    }
+
+    public function add_clientes () {
+        $usuario = usuario()->id;
+        $fecha = hoy();
+
+        $cli = DB::connection('sqlsrv')
+        ->table('Cliente')
+        ->select(
+            "Cl_Contacto_1 as nombre",
+            "Cl_Contacto_2 as nombre2",
+            "Cl_Descripcion as empresa",
+            "Cl_Telefono_1 as telefono",
+            "Cl_Telefono_2 as telefono2",
+            "Cl_Telefono_3 as telefono3",
+            "Cl_email_contacto_1 as email",
+            "Cl_email_contacto_2 as email2"
+
+        )->get();
+
+        foreach ($cli as $clientes_sqlsrv) {
+            $search = Cot_Clientes::where('cli_nombre', $clientes_sqlsrv->nombre)->first();
+            if (!$search) {
+                $cliente = new Cot_Clientes();
+                $cliente->cli_nombre = $clientes_sqlsrv->nombre != ''? $clientes_sqlsrv->nombre : $clientes_sqlsrv->nombre2 ;
+                $cliente->cli_telefono = $clientes_sqlsrv->telefono != '' ? $clientes_sqlsrv->telefono : $clientes_sqlsrv->telefono2;
+                $cliente->cli_correo = $clientes_sqlsrv->email != ''? $clientes_sqlsrv->email : $clientes_sqlsrv->email2;
+                $cliente->cli_empresa = $clientes_sqlsrv->empresa;
+                $cliente->accountname = $clientes_sqlsrv->nombre != ''? $clientes_sqlsrv->nombre : $clientes_sqlsrv->nombre2;
+                $cliente->save();
+            }
+        }
+        // $clientes = Cot_Clientes::all();
+
+        // foreach ($clientes as $cli) {
+        //    if ($cli->idclientes > 21) {
+        //         $client = Cot_Clientes::find($cli->idclientes);
+        //         $client->delete();
+        //     }
+        // }
+
+        dd($cli);
     }
 }

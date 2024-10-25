@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Mail;
 //     return view('home');
 // })->middleware('auth');
 Route::get('/agregar/productos', [GlobalController::class, 'guardar_prods']);
+Route::get('/agregar/clientes', [GlobalController::class, 'add_clientes']);
 Route::middleware(['auth', 'auth.status'])->group(function () {
 Route::get('/pruebas',[PruebaController::class, 'index'])->name('prueba');
 Route::get('/', [LoginController::class, 'inicio'])->name('inicio');

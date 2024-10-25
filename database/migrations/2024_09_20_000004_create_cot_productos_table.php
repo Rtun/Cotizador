@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('modelo', 50);  // Modelo del producto
             $table->unsignedBigInteger('idproveedor');  // Llave foránea para idproveedor
             $table->string('prod_medicion', 10);  // Unidad de medida
-            $table->decimal('prod_precio_brut', 10, 5);  // Precio bruto
+            $table->decimal('prod_precio_brut', 15, 5);  // Precio bruto
             $table->string('prod_tipo', 20);  // Tipo de producto
             $table->string('status', 3)->default('AC');  // Estatus con valor por defecto 'AC'
 

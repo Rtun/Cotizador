@@ -14,13 +14,15 @@ return new class extends Migration
     {
         Schema::connection('mysql')->create('tipo_cambio', function (Blueprint $table) {
             $table->id('idtipocambio');
-            $table->decimal('valor', 10, 3);
+            $table->decimal('valor', 10, 2);
+            $table->decimal('porcentaje', 10, 2);
+            $table->decimal('valor_api', 10, 2);
 
             $table->comment('Esta tabla es únicamente para el almacenamiento del tipo de cambio, no está ligada a ninguna otra.');
         });
 
         DB::table('tipo_cambio')->insert([
-            ['idtipocambio' => 1, 'valor' => 19.877]
+            ['idtipocambio' => 1, 'valor' => 20.60, 'porcentaje' => 0.98, 'valor_api' => 19.62 ]
         ]);
     }
 
