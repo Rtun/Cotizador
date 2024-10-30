@@ -9,6 +9,15 @@ use Carbon\Carbon;
 
 
 if (!function_exists('save_bitacora')) {
+    /**
+    * Guarda la bitacora del sistema
+    *
+    * @param array tabla_modificado lo recibe como un json
+    * @param int objeto_modificado es el id de lo que se modifico
+    * @param int idusuario del usuario que esta haciendo el movimiento
+    * @param date recibe en formato datime
+    * @param string accion la recibe como string
+    */
     function save_bitacora($parametros) {
         DB::table('sist_bitacora')->insert([
             'tabla_modificada' => json_encode($parametros['tabla']),
@@ -21,12 +30,22 @@ if (!function_exists('save_bitacora')) {
 }
 
 if (!function_exists('usuario')) {
+    /**
+     * Obtiene el usuario que inicio session
+     *
+     * @return array usuario retorna los datos completos del usuario
+    */
     function usuario(){
         return Auth::user();
     }
 }
 
 if(!function_exists('hoy')) {
+    /**
+         * Obtiene la fecha
+         *
+         * @return datetime
+        */
     function hoy($formato='Y-m-d H:i:s'){
         date_default_timezone_set("America/Merida");
         return date($formato);
@@ -34,6 +53,14 @@ if(!function_exists('hoy')) {
 }
 
 if(!function_exists('validacion_rol')) {
+    /**
+     * Valida los permisos para otorgarlos en las opciones
+     *
+     * @param int idrol recibe el rol del usuario
+     * @param int permiso recibe el permiso del modulo
+     *
+     * @return bolean
+    */
     function validacion_rol($idrol, $permiso) {
         if($idrol == 1){
             return true;
